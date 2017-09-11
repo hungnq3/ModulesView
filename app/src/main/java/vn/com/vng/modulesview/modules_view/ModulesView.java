@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -17,6 +18,15 @@ import java.util.List;
  */
 
 public class ModulesView extends View {
+
+    public interface OnMeasureListener {
+        void onMeasure(ModulesView view, int withMeasureSpec, int heightMeasureSpec);
+    }
+
+    public interface OnLayoutListener {
+        void onLayout(ModulesView view, boolean changed, int width, int height);
+    }
+
     public ModulesView(Context context) {
         super(context);
     }
@@ -34,8 +44,11 @@ public class ModulesView extends View {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
-
+    //stuff
     private List<Module> mModules = new LinkedList<>();
+    private OnMeasureListener mOnMeasureListener;
+    private OnLayoutListener mOnLayoutListener;
+
 
     public void addModule(@NonNull Module module) {
         mModules.add(module);
@@ -43,9 +56,9 @@ public class ModulesView extends View {
     }
 
     public void addModule(@NonNull Module module, int left, int top, int right, int bottom) {
-        module.setBounds(left, top, right, bottom);
         mModules.add(module);
         module.setParent(this);
+        module.setBounds(left, top, right, bottom);
     }
 
     public void clearModules() {
@@ -84,25 +97,57 @@ public class ModulesView extends View {
     }
 
 
-    @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        super.onLayout(changed, left, top, right, bottom);
-        int width = right - left;
-        int height = bottom - top;
-        for (Module module : mModules) {
-            if (module.getWhenParentLayout() != null)
-                module.getWhenParentLayout().whenParentLayout(this, changed, width, height);
+    public void setSize(int width, int height) {
+        ViewGroup.LayoutParams lParams = getLayoutParams();
+        if (lParams == null)
+            lParams = new ViewGroup.LayoutParams(width, height);
+        else {
+            lParams.width = width;
+            lParams.height = height;
         }
+        setLayoutParams(lParams);
+    }
+
+
+    public OnMeasureListener getOnMeasureListener() {
+        return mOnMeasureListener;
+    }
+
+    public void setOnMeasureListener(OnMeasureListener onMeasureListener) {
+        mOnMeasureListener = onMeasureListener;
+    }
+
+    public OnLayoutListener getOnLayoutListener() {
+        return mOnLayoutListener;
+    }
+
+    public void setOnLayoutListener(OnLayoutListener onLayoutListener) {
+        mOnLayoutListener = onLayoutListener;
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        if (mOnMeasureListener != null)
+            mOnMeasureListener.onMeasure(this, widthMeasureSpec, heightMeasureSpec);
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+
+        int width = right - left;
+        int height = bottom - top;
+        //notify listener & config modules
+        if (mOnLayoutListener != null)
+            mOnLayoutListener.onLayout(this, changed, width, height);
+
         for (Module module : mModules) {
-            if (module.getWhenParentMeasure() != null)
-                module.getWhenParentMeasure().whenParentMeasure(this, widthMeasureSpec, heightMeasureSpec);
+            if (!module.isIgnoreConfigFromParent())
+                module.configModule(changed);
         }
     }
+
 
     @Override
     protected void onDraw(Canvas canvas) {
