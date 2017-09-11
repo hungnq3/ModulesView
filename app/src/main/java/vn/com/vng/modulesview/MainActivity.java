@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
     ModulesView buildModulesView(){
         ModulesView view= new ModulesView(this);
-        view.setSize(ViewGroup.LayoutParams.MATCH_PARENT, 300);
+        view.setSize(ViewGroup.LayoutParams.MATCH_PARENT, dp(100));
         view.setBackgroundColor(0xffdddddd);
 
         //create image module
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         textModule.setText("Hello world world world world world world world world  ");
 
 
-        view.addModule(imgModule, 20, 20, 280,280);
+        view.addModule(imgModule, dp(8), dp(8), dp(84),dp(84));
         view.addModule(textModule);
 
         //set bound on runtime
@@ -53,9 +53,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onMeasure(ModulesView view, int withMeasureSpec, int heightMeasureSpec) {
                 int width = View.MeasureSpec.getSize(view.getMeasuredWidth());
-                textModule.setBounds(320,20, width-20, Module.BOUND_UNKNOWN);
+                textModule.setBounds(dp(100),dp(8), width-dp(8), Module.BOUND_UNKNOWN);
             }
-         });
+        });
 
         return view;
     }
