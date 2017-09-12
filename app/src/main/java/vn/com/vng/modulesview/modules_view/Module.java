@@ -2,7 +2,10 @@ package vn.com.vng.modulesview.modules_view;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.view.ViewGroup;
+import android.os.Handler;
+import android.util.Log;
+import android.view.MotionEvent;
+import android.widget.Toast;
 
 /**
  * Created by HungNQ on 08/09/2017.
@@ -10,20 +13,21 @@ import android.view.ViewGroup;
 
 public class Module {
 
-    public static final int MATCH_PARENT = ViewGroup.LayoutParams.MATCH_PARENT;
-    public static final int WRAP_CONTENT = ViewGroup.LayoutParams.WRAP_CONTENT;
 
-    public static final int BOUND_UNKNOWN = -1;
+    public static final int SPECIFIC_LATER = -1;
 
+    //stuff
     protected Context mContext;
     protected ModulesView mParent;
-    protected boolean mIgnoreConfigFromParent;
 
 
+    //properties
     protected int mLeft, mTop, mRight, mBottom;
-    protected int mWidth, mHeight;
-
     protected int mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom;
+
+    private OnClickListener mOnClickListener;
+    private OnLongClickListener mOnLongClickListener;
+
 
     public ModulesView getParent() {
         return mParent;
@@ -51,41 +55,167 @@ public class Module {
     }
 
 
+    public int getPaddingLeft() {
+        return mPaddingLeft;
+    }
+
+    public void setPaddingLeft(int paddingLeft) {
+        mPaddingLeft = paddingLeft;
+    }
+
+    public int getPaddingTop() {
+        return mPaddingTop;
+    }
+
+    public void setPaddingTop(int paddingTop) {
+        mPaddingTop = paddingTop;
+    }
+
+    public int getPaddingRight() {
+        return mPaddingRight;
+    }
+
+    public void setPaddingRight(int paddingRight) {
+        mPaddingRight = paddingRight;
+    }
+
+    public int getPaddingBottom() {
+        return mPaddingBottom;
+    }
+
+    public void setPaddingBottom(int paddingBottom) {
+        mPaddingBottom = paddingBottom;
+    }
+
+    public void setPadding(int left, int top, int right, int bottom) {
+        mPaddingLeft = left;
+        mPaddingTop = top;
+        mPaddingRight = right;
+        mPaddingBottom = bottom;
+    }
+
+    public void setPadding(int padding) {
+        mPaddingLeft = mPaddingTop = mPaddingRight = mPaddingBottom = padding;
+    }
+
     final public void setBounds(int left, int top, int right, int bottom) {
-        boolean changed = checkLayoutChanged(mLeft, mTop, mRight, mBottom, left, top, right, bottom);
         mLeft = left;
         mRight = right;
         mBottom = bottom;
         mTop = top;
-        mWidth = mRight - mLeft;
-        mHeight = mBottom - mTop;
-
-        onSetBound(changed, mLeft, mTop, mRight, mBottom);
     }
 
-    protected void onSetBound(boolean layoutChanged, int left, int top, int right, int bottom) {
-
+    public void setOnClickListener(OnClickListener onClickListener) {
+        mOnClickListener = onClickListener;
     }
 
-    public boolean isIgnoreConfigFromParent() {
-        return mIgnoreConfigFromParent;
-    }
-
-    public void setIgnoreConfigFromParent(boolean ignoreConfigFromParent) {
-        mIgnoreConfigFromParent = ignoreConfigFromParent;
-    }
-
-    public void configModule(boolean changed){
+    public void setOnLongClickListener(OnLongClickListener onLongClickListener) {
+        mOnLongClickListener = onLongClickListener;
     }
 
 
-    private boolean checkLayoutChanged(int oldLeft, int oldTop, int oldRight, int oldBottom, int newLeft, int newTop, int newRight, int newBottom) {
-        return ((oldRight - oldLeft) != (newRight - newLeft)) || ((oldTop - oldBottom) != (newTop - newBottom));
+    public void configModule() {
     }
+
+
+//    private boolean checkLayoutChanged(int oldLeft, int oldTop, int oldRight, int oldBottom, int newLeft, int newTop, int newRight, int newBottom) {
+//        return ((oldRight - oldLeft) != (newRight - newLeft)) || ((oldTop - oldBottom) != (newTop - newBottom));
+//    }
 
 
     protected void draw(Canvas canvas) {
 
     }
+
+
+    //handle event
+
+    public boolean clickable() {
+        return mOnClickListener != null;
+    }
+
+    public boolean longClickable() {
+        return mOnLongClickListener != null;
+    }
+
+    protected boolean onTouchEvent(MotionEvent e) {
+        boolean handled = false;
+        switch (e.getAction()) {
+            case MotionEvent.ACTION_DOWN: {
+                handled = clickable() || longClickable();
+
+                if (longClickable())
+                    startWaitingLongClick();
+                break;
+            }
+
+            case MotionEvent.ACTION_UP: {
+                cancelLongClickWaiting();
+                handled = clickable();
+                if (clickable() && mOnClickListener != null)
+                    performClick();
+                break;
+            }
+            case MotionEvent.ACTION_CANCEL: {
+                cancelLongClickWaiting();
+                break;
+            }
+        }
+        return handled;
+    }
+
+    private Handler mLongClickTriggerHandler;
+    private Runnable mLongClickTriggerRunnable = new Runnable() {
+        @Override
+        public void run() {
+            performLongClick();
+
+            //trigger cancel touch event to parent
+            if (mParent != null)
+                mParent.onTouchEvent(MotionEvent.obtain(0, 0, MotionEvent.ACTION_CANCEL, getLeft(), getTop(), 0));
+        }
+    };
+
+
+    private static final long LONG_CLICK_TIME = 800;
+
+    private void startWaitingLongClick() {
+        if (mLongClickTriggerHandler == null && mContext == null)
+            return;
+        cancelLongClickWaiting();
+        if (mLongClickTriggerHandler == null)
+            mLongClickTriggerHandler = new Handler();
+        mLongClickTriggerHandler.removeCallbacks(mLongClickTriggerRunnable);
+        mLongClickTriggerHandler.postDelayed(mLongClickTriggerRunnable, LONG_CLICK_TIME);
+    }
+
+    private void cancelLongClickWaiting() {
+        if (mLongClickTriggerHandler != null)
+            mLongClickTriggerHandler.removeCallbacks(mLongClickTriggerRunnable);
+    }
+
+
+    private void performLongClick() {
+        if (mOnLongClickListener != null)
+            mOnLongClickListener.onLongClick(this);
+    }
+
+    private void performClick() {
+        if (mOnClickListener != null)
+            mOnClickListener.onClick(this);
+    }
+
+
+    //-------------interface region--------------------
+    public interface OnClickListener {
+        void onClick(Module module);
+    }
+
+    public interface OnLongClickListener {
+        void onLongClick(Module module);
+    }
+
+    //--------------endregion--------------------------
+
 
 }

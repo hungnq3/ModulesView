@@ -8,6 +8,7 @@ import android.text.Layout;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 
 import com.facebook.fbui.textlayoutbuilder.TextLayoutBuilder;
 
@@ -152,19 +153,28 @@ public class TextModule extends Module {
 
 
     @Override
-    public void configModule(boolean changed) {
-        super.configModule(changed);
-        if (changed) {
-            buildTextLayout();
-            configClipBounds();
-        }
+    public void configModule() {
+        super.configModule();
+        buildTextLayout();
+        configClipBounds();
     }
 
     private void buildTextLayout() {
+        //resolve specific later params
+        if (mLeft == SPECIFIC_LATER)
+            mLeft = 0;
+        if (mTop == SPECIFIC_LATER)
+            mTop = 0;
+        if (mRight == SPECIFIC_LATER) {
+            if (getParent() != null)
+                mRight = mParent.getWidth();
+            else
+                mRight = 0;
+        }
 
-        int width = Math.max(mRight - mLeft - mPaddingLeft - mPaddingRight, 0);
+        int textWidth = Math.max(mRight - mLeft - mPaddingLeft - mPaddingRight, 0);
         //build a layout to calculate text width and height
-        mTextLayout = buildTextLayout(width);
+        mTextLayout = buildTextLayout(textWidth);
 
 //        int textWidth;
 //        if (mTextLayout.getLineCount() <= 1) {
@@ -172,30 +182,18 @@ public class TextModule extends Module {
 //        } else
 //            textWidth = width;
 
-//        if (mBottom == BOUND_UNKNOWN) {
-//            int textHeight = mTextLayout.getLineBottom(mTextLayout.getLineCount() - 1) - mTextLayout.getLineTop(0);
-//            mBottom = mTop + textHeight + mPaddingTop + mPaddingBottom;
-//            setBounds(mLeft, mTop, mRight, mBottom);
-//        }
-    }
 
-    private void configClipBounds() {
-        int width = mRight - mBottom;
-        int height = mBottom - mTop;
-        if(width >0 && height >0){
-            width = width - mPaddingLeft - mPaddingRight;
-            height = height - mPaddingBottom - mPaddingTop;
-            mClipRect.set(0,0,width,height);
-        }else{        //unnecessary
-            mClipRect.setEmpty();
+        if (mBottom == SPECIFIC_LATER) {
+            int textHeight = mTextLayout.getHeight();
+            mBottom = mTop + textHeight + mPaddingTop + mPaddingBottom;
         }
     }
 
 
-    @Override
-    protected void onSetBound(boolean layoutChanged, int left, int top, int right, int bottom) {
-        Log.d("text", "onSetBound: " + left + " - " + top + " - " + right + " - " + bottom);
-        super.onSetBound(layoutChanged, left, top, right, bottom);
+    private void configClipBounds() {
+        int width = mRight - mLeft;
+        int height = mBottom - mTop;
+        mClipRect.set(0, 0, width, height);
     }
 
 
@@ -227,8 +225,7 @@ public class TextModule extends Module {
             canvas.translate(translateLeft, translateTop);
 
         //clip drawing region
-        if(!mClipRect.isEmpty())
-            canvas.clipRect(mClipRect);
+        canvas.clipRect(mClipRect);
 
         if (mTextLayout != null)
             mTextLayout.draw(canvas);

@@ -111,17 +111,27 @@ public class ImageModule extends Module {
 
 
     @Override
-    public void configModule(boolean changed) {
-        super.configModule(changed);
-        if (changed) {
-            configureImageBounds();
-            configureClipBounds();
-        }
+    public void configModule() {
+        super.configModule();
+        configureImageBounds();
+        configureClipBounds();
     }
 
 
     //copy a part of ImageView.configureBounds(()
     private void configureImageBounds() {
+
+
+        //resolve specific_later params
+        if (mLeft == SPECIFIC_LATER)
+            mLeft = 0;
+        if (mTop == SPECIFIC_LATER)
+            mTop = 0;
+        if (mRight == SPECIFIC_LATER)
+            mRight = 0;
+        if (mBottom == SPECIFIC_LATER)
+            mBottom =0;
+
 
         if (mDrawable == null) {
             return;
@@ -130,8 +140,8 @@ public class ImageModule extends Module {
         final int dwidth = mDrawableWidth;
         final int dheight = mDrawableHeight;
 
-        final int vwidth = mWidth - mPaddingLeft - mPaddingRight;
-        final int vheight = mHeight - mPaddingTop - mPaddingBottom;
+        final int vwidth = mRight - mLeft - mPaddingLeft - mPaddingRight;
+        final int vheight = mBottom - mTop - mPaddingTop - mPaddingBottom;
 
         final boolean fits = (dwidth < 0 || vwidth == dwidth)
                 && (dheight < 0 || vheight == dheight);
@@ -199,7 +209,6 @@ public class ImageModule extends Module {
             }
         }
     }
-
 
     private void configureClipBounds() {
         if (mDrawable != null) {

@@ -1,73 +1,43 @@
 package vn.com.vng.modulesview;
 
+import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import vn.com.vng.modulesview.modules_view.ImageModule;
 import vn.com.vng.modulesview.modules_view.Module;
 import vn.com.vng.modulesview.modules_view.ModulesView;
 import vn.com.vng.modulesview.modules_view.TextModule;
+import vn.com.vng.modulesview.sample.adapter.DemoAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
-    ViewGroup mRootLayout;
+    RecyclerView recyclerView;
+    DemoAdapter mDemoAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mRootLayout = (ViewGroup) findViewById(R.id.root_layout);
-
-        ModulesView view = buildModulesView();
-        mRootLayout.addView(view);
+        recyclerView = (RecyclerView) findViewById(R.id.recycler);
+        setupRecycler();
 
     }
 
+    private void setupRecycler() {
+        mDemoAdapter = new DemoAdapter();
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        recyclerView.setAdapter(mDemoAdapter);
 
-    ModulesView buildModulesView(){
-        ModulesView view= new ModulesView(this);
-        view.setSize(ViewGroup.LayoutParams.MATCH_PARENT, dp(100));
-        view.setBackgroundColor(0xffdddddd);
-
-        //create image module
-        ImageModule imgModule = new ImageModule();
-        imgModule.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.img ));
-        imgModule.setScaleType(ImageModule.ScaleType.CENTER_CROP);
-        imgModule.setRoundCorner(ImageModule.ROUND_CIRCLE);
-
-
-        //create text module
-        final TextModule textModule = new TextModule();
-        textModule.setTextSize(sp(16));
-        textModule.setText("Hello world world world world world world world world  ");
-
-
-        view.addModule(imgModule, dp(8), dp(8), dp(84),dp(84));
-        view.addModule(textModule);
-
-        //set bound on runtime
-        view.setOnMeasureListener(new ModulesView.OnMeasureListener() {
-            @Override
-            public void onMeasure(ModulesView view, int withMeasureSpec, int heightMeasureSpec) {
-                int width = View.MeasureSpec.getSize(view.getMeasuredWidth());
-                textModule.setBounds(dp(100),dp(8), width-dp(8), Module.BOUND_UNKNOWN);
-            }
-        });
-
-        return view;
     }
-
-    private int sp(int sp){
-        return (int) (getResources().getDisplayMetrics().scaledDensity * sp);
-    }
-
-    private int dp(int dp){
-        return (int) (getResources().getDisplayMetrics().density * dp);
-    }
-
-
 
 }

@@ -7,6 +7,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -48,6 +50,7 @@ public class ModulesView extends View {
     private List<Module> mModules = new LinkedList<>();
     private OnMeasureListener mOnMeasureListener;
     private OnLayoutListener mOnLayoutListener;
+    private Module mTouchFocusModule;
 
 
     public void addModule(@NonNull Module module) {
@@ -125,6 +128,12 @@ public class ModulesView extends View {
         mOnLayoutListener = onLayoutListener;
     }
 
+    public void notifyModulesUpdate() {
+        for (Module module : mModules) {
+            module.configModule();
+        }
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
@@ -141,11 +150,15 @@ public class ModulesView extends View {
         //notify listener & config modules
         if (mOnLayoutListener != null)
             mOnLayoutListener.onLayout(this, changed, width, height);
+//
+//        for (Module module : mModules) {
+//            if (!module.isIgnoreConfigFromParent())
+//                module.configModule(changed);
+//        }
+    }
 
-        for (Module module : mModules) {
-            if (!module.isIgnoreConfigFromParent())
-                module.configModule(changed);
-        }
+    public void setMeasureDimension(int width, int height) {
+        setMeasuredDimension(width, height);
     }
 
 
@@ -157,5 +170,70 @@ public class ModulesView extends View {
         }
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        boolean handle = false;
 
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN: {
+
+                for (Module module : mModules) {
+                    if (checkEventRegion(module, event)) {
+                        handle = module.onTouchEvent(event);
+                        if (handle) {
+                            mTouchFocusModule = module;
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+
+            case MotionEvent.ACTION_UP: {
+                if (mTouchFocusModule != null) {
+                    if (checkEventRegion(mTouchFocusModule, event))
+                        handle = mTouchFocusModule.onTouchEvent(event);
+                    mTouchFocusModule = null;
+                }
+
+                break;
+            }
+
+            case MotionEvent.ACTION_MOVE: {
+                if (mTouchFocusModule != null) {
+                    if (checkEventRegion(mTouchFocusModule, event))
+                        handle = mTouchFocusModule.onTouchEvent(event);
+                    else {
+                        MotionEvent eventCancel = MotionEvent.obtain(event);
+                        eventCancel.setAction(MotionEvent.ACTION_CANCEL);
+                        handle = mTouchFocusModule.onTouchEvent(eventCancel);
+                        mTouchFocusModule = null;
+                    }
+                }
+                break;
+            }
+            case MotionEvent.ACTION_CANCEL: {
+                if (mTouchFocusModule != null) {
+                    handle = mTouchFocusModule.onTouchEvent(event);
+                    mTouchFocusModule = null;
+                }
+                break;
+            }
+        }
+        return handle || super.onTouchEvent(event);
+    }
+
+    /**
+     * @param module
+     * @param event
+     * @return true if event occuren in module's bounds
+     */
+
+    private boolean checkEventRegion(Module module, MotionEvent event) {
+        int x = (int) (event.getX() - getX());
+        int y = (int) (event.getY() - getX());
+
+        return x < module.getRight() && x > module.getLeft()
+                && y > module.getTop() && y < module.getBottom();
+    }
 }
