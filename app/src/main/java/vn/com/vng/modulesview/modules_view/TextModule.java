@@ -5,6 +5,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.text.Layout;
+import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.Log;
@@ -208,9 +209,19 @@ public class TextModule extends Module {
             mTextSize = (int) (DEFAULT_TEXT_SIZE_IN_SP * mContext.getResources().getDisplayMetrics().scaledDensity);
             mTextLayoutBuilder.setTextSize(mTextSize);
         }
-        return mTextLayoutBuilder
+        Layout layout = mTextLayoutBuilder
                 .setWidth(width)
                 .build();
+
+
+        //fix layout null when text empty
+        if(layout == null) {
+            TextPaint textPaint = new TextPaint();
+            textPaint.setTextSize(mTextSize);
+            layout = new StaticLayout("", textPaint, width, mAlignment, mTextLayoutBuilder.getTextSpacingMultiplier(), mTextLayoutBuilder.getTextSpacingExtra(), false);
+        }
+
+        return layout;
     }
 
     @Override

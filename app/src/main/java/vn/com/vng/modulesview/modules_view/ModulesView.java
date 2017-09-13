@@ -30,27 +30,36 @@ public class ModulesView extends View {
     }
 
     public ModulesView(Context context) {
-        super(context);
+        this(context, null);
     }
 
     public ModulesView(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0);
     }
 
     public ModulesView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        init();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public ModulesView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+        init();
     }
+
 
     //stuff
     private List<Module> mModules = new LinkedList<>();
     private OnMeasureListener mOnMeasureListener;
     private OnLayoutListener mOnLayoutListener;
     private Module mTouchFocusModule;
+
+
+
+    protected void init() {
+
+    }
 
 
     public void addModule(@NonNull Module module) {

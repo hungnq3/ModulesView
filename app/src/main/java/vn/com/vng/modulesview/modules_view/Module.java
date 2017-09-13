@@ -1,7 +1,12 @@
 package vn.com.vng.modulesview.modules_view;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -19,11 +24,13 @@ public class Module {
     //stuff
     protected Context mContext;
     protected ModulesView mParent;
-
+    protected Rect mRectBound;
 
     //properties
     protected int mLeft, mTop, mRight, mBottom;
     protected int mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom;
+
+    protected Drawable mBackgroundDrawable;
 
     private OnClickListener mOnClickListener;
     private OnLongClickListener mOnLongClickListener;
@@ -37,6 +44,9 @@ public class Module {
         mParent = parent;
         mContext = mParent != null ? mParent.getContext() : null;
     }
+
+
+    //-------------------getter & setter----------
 
     public int getLeft() {
         return mLeft;
@@ -98,12 +108,6 @@ public class Module {
         mPaddingLeft = mPaddingTop = mPaddingRight = mPaddingBottom = padding;
     }
 
-    final public void setBounds(int left, int top, int right, int bottom) {
-        mLeft = left;
-        mRight = right;
-        mBottom = bottom;
-        mTop = top;
-    }
 
     public void setOnClickListener(OnClickListener onClickListener) {
         mOnClickListener = onClickListener;
@@ -113,6 +117,41 @@ public class Module {
         mOnLongClickListener = onLongClickListener;
     }
 
+
+    public void setBackgroundBitmap(Bitmap backgroundBitmap) {
+        clearBackground();
+        mBackgroundDrawable = new BitmapDrawable(null, backgroundBitmap);
+    }
+
+    public Drawable getBackgroundDrawable() {
+        return mBackgroundDrawable;
+    }
+
+    public void setBackgroundDrawable(Drawable backgroundDrawable) {
+        clearBackground();
+        mBackgroundDrawable = backgroundDrawable;
+    }
+
+
+    public void setBackgroundColor(int backgroundColor) {
+        clearBackground();
+        mBackgroundDrawable = new ColorDrawable(backgroundColor);
+    }
+
+    public void clearBackground() {
+        mBackgroundDrawable = null;
+    }
+
+
+    //--------------config region-------------
+
+
+    final public void setBounds(int left, int top, int right, int bottom) {
+        mLeft = left;
+        mRight = right;
+        mBottom = bottom;
+        mTop = top;
+    }
 
     public void configModule() {
     }
@@ -124,7 +163,16 @@ public class Module {
 
 
     protected void draw(Canvas canvas) {
+        drawBackdround(canvas);
+    }
 
+    protected void drawBackdround(Canvas canvas) {
+        if (canvas != null && mBackgroundDrawable != null) {
+            if (mLeft >= 0 && mTop >= 0 && mRight > 0 && mBottom > 0) {
+                mBackgroundDrawable.setBounds(mLeft, mTop, mRight, mBottom);
+                mBackgroundDrawable.draw(canvas);
+            }
+        }
     }
 
 

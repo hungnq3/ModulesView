@@ -1,4 +1,4 @@
-package vn.com.vng.modulesview.sample;
+package vn.com.vng.modulesview.temp;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -23,19 +23,24 @@ public class DemoViewFactory {
 
 
     public static ModulesView buildDemoView(final Context context) {
-        final ModulesView view = new ModulesView(context);
 
         Drawable drawableimg = ContextCompat.getDrawable(context, R.drawable.img);
         Drawable drawableLike = ContextCompat.getDrawable(context, R.drawable.ic_heart);
         Drawable drawableComment = ContextCompat.getDrawable(context, R.drawable.ic_comment);
         Drawable drawableMore = ContextCompat.getDrawable(context, R.drawable.ic_more);
 
+
+
+        final ModulesView view = new ModulesView(context);
+
         final ImageModule imgAva = buildImageModule(drawableimg, ImageModule.ScaleType.CENTER_CROP, ImageModule.ROUND_CIRCLE);
+        final TextModule textName = buildTextModule("Cú vọ", sp(16), 0xff050505, Typeface.DEFAULT);
+        final TextModule textTime = buildTextModule("20:27 Hôm qua", sp(12), 0xffaaaaaa, Typeface.DEFAULT);
+
+        final TextModule textContent = buildTextModule("Cả cả cả mọi người trên thể giới ra đây mà xem, ra mà xem, ra mà xem, ra hết đây mà xem đê!!!", sp(14), 0xff222222, Typeface.DEFAULT);
         final ImageModule img1 = buildImageModule(drawableimg, ImageModule.ScaleType.CENTER_CROP, ImageModule.ROUND_NONE);
         final ImageModule img2 = buildImageModule(drawableimg, ImageModule.ScaleType.CENTER_CROP, ImageModule.ROUND_NONE);
         final ImageModule img3 = buildImageModule(drawableimg, ImageModule.ScaleType.CENTER_CROP, ImageModule.ROUND_NONE);
-        final TextModule textName = buildTextModule("Name", sp(16), 0xff050505, Typeface.DEFAULT);
-        final TextModule textTime = buildTextModule("20:27 Hôm qua", sp(12), 0xffaaaaaa, Typeface.DEFAULT);
 
 
         final ImageModule imgLike = buildImageModule(drawableLike, ImageModule.ScaleType.FIT_CENTER, ImageModule.ROUND_NONE);
@@ -44,28 +49,36 @@ public class DemoViewFactory {
         final ImageModule imgComment = buildImageModule(drawableComment, ImageModule.ScaleType.FIT_CENTER, ImageModule.ROUND_NONE);
         final ImageModule imgMore = buildImageModule(drawableMore, ImageModule.ScaleType.FIT_CENTER, ImageModule.ROUND_NONE);
 
-        imgLike.setPadding(dp(6));
-        textLike.setPadding(dp(1),dp(4),dp(4),dp(4));
-        textComment.setPadding(dp(4));
-        imgComment.setPadding(dp(2));
-        imgMore.setPadding(dp(8), dp(4), dp(12), dp(4));
 
         //add header
         view.addModule(imgAva);
         view.addModule(textName);
         view.addModule(textTime);
 
-        //add image
+        //add content
+        view.addModule(textContent);
+
+//        add image
         view.addModule(img1);
         view.addModule(img2);
         view.addModule(img3);
 
-        //add footer
+//        add footer
         view.addModule(imgLike);
         view.addModule(textLike);
         view.addModule(imgComment);
         view.addModule(textComment);
         view.addModule(imgMore);
+
+
+
+        //config a few properties
+        textContent.setPadding(dp(8), dp(4), dp(8), dp(4));
+        imgLike.setPadding(dp(6));
+        textLike.setPadding(dp(1),dp(4),dp(4),dp(4));
+        textComment.setPadding(dp(4));
+        imgComment.setPadding(dp(2));
+        imgMore.setPadding(dp(8), dp(4), dp(12), dp(4));
 
 
         //declare modules' size
@@ -86,7 +99,6 @@ public class DemoViewFactory {
 
 
 
-        //init header's modules have bounds
         imgAva.setBounds(avaMargin, avaMargin, avaMargin + avaSize, avaMargin + avaSize);
         imgAva.configModule();
 
@@ -99,9 +111,6 @@ public class DemoViewFactory {
 
                 //init view size
                 int widthSize = View.MeasureSpec.getSize(withMeasureSpec);
-                int heightSize = View.MeasureSpec.getSize(heightMeasureSpec);
-                view.setMeasureDimension(widthSize, widthSize + headerHeight + footerHeight + footerMarginTop);
-
 
                 //init header region
                 textName.setBounds(avaMargin * 2 + avaSize, textNameMargin, widthSize - textNameMargin, Module.SPECIFIC_LATER);
@@ -110,8 +119,13 @@ public class DemoViewFactory {
                 textTime.setBounds(textName.getLeft(), textName.getBottom(), widthSize - textNameMargin, Module.SPECIFIC_LATER);
                 textTime.configModule();
 
+                //init content
+                textContent.setBounds(0, headerHeight, widthSize, Module.SPECIFIC_LATER);
+                textContent.configModule();
+                int contentHeight = textContent.getBottom() - textContent.getTop();
+
                 //init image region
-                int imgRegionTop = headerHeight;
+                int imgRegionTop = headerHeight + contentHeight;
 
                 int temp1 = (int) (widthSize * 2f / 3);
                 int temp2 = (int) (widthSize / 2f);
@@ -124,7 +138,7 @@ public class DemoViewFactory {
                 img3.configModule();
 
                 //init footer region
-                int footerTop = headerHeight + widthSize + footerMarginTop;
+                int footerTop = headerHeight + contentHeight + widthSize + footerMarginTop;
 
                 imgLike.setBounds(0, footerTop, likeImgSize, footerTop + footerHeight);
 
@@ -148,6 +162,8 @@ public class DemoViewFactory {
                 textComment.configModule();
                 imgComment.configModule();
                 imgMore.configModule();
+
+                view.setMeasureDimension(widthSize, widthSize + headerHeight+ contentHeight + footerHeight + footerMarginTop);
             }
         });
 
@@ -203,6 +219,18 @@ public class DemoViewFactory {
             }
         });
 
+        //test background
+//        textTime.setBackgroundColor(0xffdddddd);
+//        textName.setBackgroundColor(0xffcccccc);
+//        imgAva.setBackgroundColor(0xffbbbbbb);
+//
+//        imgLike.setBackgroundColor(0xffcccccc);
+//        textLike.setBackgroundColor(0xffcccccc);
+//
+//        imgComment.setBackgroundColor(0xffdddddd);
+//        textComment.setBackgroundColor(0xffdddddd);
+//
+//        imgMore.setBackgroundColor(0xffbbbbbb);
         return view;
     }
 
