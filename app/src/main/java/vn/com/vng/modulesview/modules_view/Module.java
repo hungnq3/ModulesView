@@ -143,6 +143,16 @@ public class Module {
     }
 
 
+    public void translate(int x, int y){
+        if(mTop >= 0)
+            mTop +=y;
+        if(mBottom >= 0)
+            mBottom +=y;
+        if(mLeft>=0)
+            mLeft+=x;
+        if(mRight>=0)
+            mRight +=x;
+    }
     //--------------config region-------------
 
 

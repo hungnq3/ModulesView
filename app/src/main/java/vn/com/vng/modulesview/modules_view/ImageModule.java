@@ -86,7 +86,7 @@ public class ImageModule extends Module {
     }
 
     public void setBitmap(Bitmap bitmap) {
-        setImageDrawable(new BitmapDrawable(mContext.getResources(), bitmap));
+        setImageDrawable(new BitmapDrawable(mContext != null ? mContext.getResources(): null, bitmap));
     }
 
     public void setImageDrawable(Drawable drawable) {
@@ -101,10 +101,6 @@ public class ImageModule extends Module {
         }
 
 
-    }
-
-    public boolean isShouldCacheBitmap() {
-        return mShouldCacheBitmap;
     }
 
     //-------------endregion------------------

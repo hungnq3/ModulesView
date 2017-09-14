@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 import java.util.LinkedList;
 import java.util.List;
 
+import vn.com.vng.modulesview.Application;
+
 /**
  * Created by HungNQ on 08/09/2017.
  */
@@ -39,14 +41,13 @@ public class ModulesView extends View {
 
     public ModulesView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public ModulesView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init();
     }
+
 
 
     //stuff
@@ -57,17 +58,26 @@ public class ModulesView extends View {
 
 
 
-    protected void init() {
-
+    public void addModules(@NonNull List<? extends Module> modules){
+        for (Module module : modules) {
+            if(module != null && module.getParent() == null) {
+                mModules.add(module);
+                module.setParent(this);
+            }
+        }
     }
 
 
     public void addModule(@NonNull Module module) {
+        if(module.getParent() != null)
+            return;
         mModules.add(module);
         module.setParent(this);
     }
 
     public void addModule(@NonNull Module module, int left, int top, int right, int bottom) {
+        if(module.getParent() != null)
+            return;
         mModules.add(module);
         module.setParent(this);
         module.setBounds(left, top, right, bottom);
@@ -81,8 +91,10 @@ public class ModulesView extends View {
     }
 
     public void removeModule(Module module) {
-        if (module != null)
+        if (module != null) {
             mModules.remove(module);
+            module.setParent(null);
+        }
     }
 
     public Module removeModule(int position) {
@@ -245,4 +257,20 @@ public class ModulesView extends View {
         return x < module.getRight() && x > module.getLeft()
                 && y > module.getTop() && y < module.getBottom();
     }
+
+
+    @Override
+    public boolean isInTouchMode() {
+        return true;
+    }
+
+    public int sp(int sp) {
+        return (int) (getContext().getResources().getDisplayMetrics().scaledDensity * sp);
+
+    }
+
+    public int dp(int dp) {
+        return (int) (getContext().getResources().getDisplayMetrics().density * dp);
+    }
+
 }
