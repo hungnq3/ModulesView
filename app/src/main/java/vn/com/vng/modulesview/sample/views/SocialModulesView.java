@@ -293,10 +293,10 @@ public class SocialModulesView extends ModulesView {
 
 
     protected int configHeaderOnMeasure(int top, int widthSize) {
-        textName.setBounds(avaMargin * 2 + avaSize, top + textNameMargin, widthSize - textNameMargin, Module.SPECIFIC_LATER);
+        textName.setBounds(avaMargin * 2 + avaSize, top + textNameMargin, Module.SPECIFIC_LATER, Module.SPECIFIC_LATER);
         textName.configModule();
 
-        textTime.setBounds(textName.getLeft(), top + textName.getBottom(), widthSize - textNameMargin, Module.SPECIFIC_LATER);
+        textTime.setBounds(textName.getLeft(), top + textName.getBottom(), Module.SPECIFIC_LATER, Module.SPECIFIC_LATER);
         textTime.configModule();
 
         return headerHeight;
@@ -371,7 +371,6 @@ public class SocialModulesView extends ModulesView {
                 bindNoData();
 
             }
-
         }
     }
 
@@ -397,7 +396,6 @@ public class SocialModulesView extends ModulesView {
 
         textName.setText(model.getName());
         textTime.setText(model.getTime());
-        textContent.setText(model.getContent());
     }
 
 

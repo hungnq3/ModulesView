@@ -17,14 +17,12 @@ import android.widget.Toast;
  */
 
 public class Module {
-
-
     public static final int SPECIFIC_LATER = -1;
+    private static final long LONG_CLICK_TIME = 500;
 
     //stuff
     protected Context mContext;
     protected ModulesView mParent;
-    protected Rect mRectBound;
 
     //properties
     protected int mLeft, mTop, mRight, mBottom;
@@ -43,6 +41,10 @@ public class Module {
     void setParent(ModulesView parent) {
         mParent = parent;
         mContext = mParent != null ? mParent.getContext() : null;
+    }
+
+    public Context getContext() {
+        return mContext;
     }
 
 
@@ -167,10 +169,6 @@ public class Module {
     }
 
 
-//    private boolean checkLayoutChanged(int oldLeft, int oldTop, int oldRight, int oldBottom, int newLeft, int newTop, int newRight, int newBottom) {
-//        return ((oldRight - oldLeft) != (newRight - newLeft)) || ((oldTop - oldBottom) != (newTop - newBottom));
-//    }
-
 
     protected void draw(Canvas canvas) {
         drawBackdround(canvas);
@@ -235,7 +233,6 @@ public class Module {
     };
 
 
-    private static final long LONG_CLICK_TIME = 800;
 
     private void startWaitingLongClick() {
         if (mLongClickTriggerHandler == null && mContext == null)

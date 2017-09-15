@@ -1,14 +1,18 @@
 package vn.com.vng.modulesview.modules_view;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
+import android.graphics.Region;
+import android.graphics.Xfermode;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 
 /**
  * Created by HungNQ on 08/09/2017.
@@ -37,7 +41,6 @@ public class ImageModule extends Module {
     private void init() {
         mMatrix = new Matrix();
         mScaleType = ScaleType.FIT_CENTER;
-
     }
 
 
@@ -86,7 +89,7 @@ public class ImageModule extends Module {
     }
 
     public void setBitmap(Bitmap bitmap) {
-        setImageDrawable(new BitmapDrawable(mContext != null ? mContext.getResources(): null, bitmap));
+        setImageDrawable(new BitmapDrawable(mContext != null ? mContext.getResources() : null, bitmap));
     }
 
     public void setImageDrawable(Drawable drawable) {
@@ -99,8 +102,6 @@ public class ImageModule extends Module {
             mDrawableWidth = -1;
             mDrawableHeight = -1;
         }
-
-
     }
 
     //-------------endregion------------------
@@ -111,6 +112,43 @@ public class ImageModule extends Module {
         super.configModule();
         configureImageBounds();
         configureClipBounds();
+    }
+
+
+    private void drawOnCacheBitmap() {
+        if (mDrawable == null)
+            return;
+        ;
+        int width = mRight - mLeft - mPaddingLeft - mPaddingRight;
+        int height = mBottom - mTop - mPaddingTop - mPaddingBottom;
+        if (width > 0 && height > 0) {
+            createCacheBitmapIfNeeded(width, height);
+            Canvas canvas = new Canvas(mCachedBitmap);
+
+            //anti alias if needed
+            if (needAntiAlias()) {
+                canvas.drawPath(mClipPath, mAntiAliasPaint);
+            }
+            //clip drawing region
+            if (!mClipPath.isEmpty())
+                canvas.clipPath(mClipPath);
+            //draw canvas with matrix
+            if (mDrawMatrix != null)
+                canvas.concat(mDrawMatrix);
+            mDrawable.draw(canvas);
+        }
+    }
+
+    private void createCacheBitmapIfNeeded(int width, int height) {
+        if (Build.VERSION.SDK_INT >= 19) {
+            try {
+                mCachedBitmap.reconfigure(width, height, mCachedBitmap.getConfig());
+            } catch (Exception e) {
+                mCachedBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            }
+        } else {
+            mCachedBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        }
     }
 
 
@@ -126,8 +164,7 @@ public class ImageModule extends Module {
         if (mRight == SPECIFIC_LATER)
             mRight = 0;
         if (mBottom == SPECIFIC_LATER)
-            mBottom =0;
-
+            mBottom = 0;
 
         if (mDrawable == null) {
             return;
@@ -220,7 +257,7 @@ public class ImageModule extends Module {
             } else if (mRoundCorner > 0) {
                 mClipPath.addRoundRect(mCLipRect, mRoundCorner, mRoundCorner, Path.Direction.CW);
             } else {
-
+                //...
             }
         }
     }
@@ -239,15 +276,19 @@ public class ImageModule extends Module {
         //NQH: this action maybe slow down the draw action
         canvas.save();
 
-        //translate if needed
+//        translate if needed
         int translateLeft = mLeft + mPaddingLeft;
         int translateTop = mTop + mPaddingTop;
         if (translateLeft > 0 || translateTop > 0)
             canvas.translate(translateLeft, translateTop);
 
         //anti alias if needed
-        if (needAntiAlias())
+        if (needAntiAlias()) {
+//            canvas.save();
+//            canvas.clipPath(mClipPath, Region.Op.DIFFERENCE);
             canvas.drawPath(mClipPath, mAntiAliasPaint);
+//            canvas.restore();
+        }
 
         //clip drawing region
         if (mClipPath.isEmpty())
@@ -255,15 +296,23 @@ public class ImageModule extends Module {
         else
             canvas.clipPath(mClipPath);
 
-
         //draw canvas with matrix
         if (mDrawMatrix != null)
             canvas.concat(mDrawMatrix);
-        mDrawable.draw(canvas);
 
+        mDrawable.draw(canvas);
 
         //NQH: this action will be slow down the draw action
         canvas.restore();
+
+
+//        if(mCachedBitmap == null)
+//            drawOnCacheBitmap();
+//
+//        if (mCachedBitmap != null)
+//            canvas.drawBitmap(mCachedBitmap, mLeft + mPaddingLeft, mTop + mPaddingTop, mAntiAliasPaint);
+
+
     }
 
 

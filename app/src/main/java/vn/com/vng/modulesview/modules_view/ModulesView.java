@@ -264,12 +264,12 @@ public class ModulesView extends View {
         return true;
     }
 
-    public int sp(int sp) {
+    public int sp(float sp) {
         return (int) (getContext().getResources().getDisplayMetrics().scaledDensity * sp);
 
     }
 
-    public int dp(int dp) {
+    public int dp(float dp) {
         return (int) (getContext().getResources().getDisplayMetrics().density * dp);
     }
 

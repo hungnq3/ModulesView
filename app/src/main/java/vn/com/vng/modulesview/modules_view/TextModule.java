@@ -166,28 +166,27 @@ public class TextModule extends Module {
             mLeft = 0;
         if (mTop == SPECIFIC_LATER)
             mTop = 0;
-        if (mRight == SPECIFIC_LATER) {
-            if (getParent() != null)
-                mRight = mParent.getWidth();
-            else
-                mRight = 0;
-        }
+//        if (mRight == SPECIFIC_LATER) {
+//            if (getParent() != null)
+//                mRight = mParent.getWidth();
+//            else
+//                mRight = 0;
+//        }
 
         int textWidth = Math.max(mRight - mLeft - mPaddingLeft - mPaddingRight, 0);
         //build a layout to calculate text width and height
         mTextLayout = buildTextLayout(textWidth);
 
-//        int textWidth;
-//        if (mTextLayout.getLineCount() <= 1) {
-//            textWidth = (int) mTextLayout.getLineWidth(0);
-//        } else
-//            textWidth = width;
-
-
         if (mBottom == SPECIFIC_LATER) {
             int textHeight = mTextLayout.getHeight();
             mBottom = mTop + textHeight + mPaddingTop + mPaddingBottom;
         }
+
+        if (mRight == SPECIFIC_LATER) {
+            textWidth = mTextLayout.getWidth();
+            mRight = mLeft + textWidth + mPaddingLeft + mPaddingRight;
+        }
+
     }
 
 
@@ -209,13 +208,15 @@ public class TextModule extends Module {
             mTextSize = (int) (DEFAULT_TEXT_SIZE_IN_SP * mContext.getResources().getDisplayMetrics().scaledDensity);
             mTextLayoutBuilder.setTextSize(mTextSize);
         }
-        Layout layout = mTextLayoutBuilder
-                .setWidth(width)
-                .build();
+        if (width > 0)
+            mTextLayoutBuilder.setWidth(width);
+        else
+            mTextLayoutBuilder.setWidth(0, TextLayoutBuilder.MEASURE_MODE_UNSPECIFIED);
 
+        Layout layout = mTextLayoutBuilder.build();
 
         //fix layout null when text empty
-        if(layout == null) {
+        if (layout == null) {
             TextPaint textPaint = new TextPaint();
             textPaint.setTextSize(mTextSize);
             layout = new StaticLayout("", textPaint, width, mAlignment, mTextLayoutBuilder.getTextSpacingMultiplier(), mTextLayoutBuilder.getTextSpacingExtra(), false);
