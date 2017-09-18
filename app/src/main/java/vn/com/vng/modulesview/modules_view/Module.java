@@ -17,15 +17,20 @@ import android.widget.Toast;
  */
 
 public class Module {
-    public static final int SPECIFIC_LATER = -1;
     private static final long LONG_CLICK_TIME = 500;
+
+    //if a bound (left, top, right, bottom) can not determine , let put SPECIFIC_LATER.
+    //Depend on each module, bounds will be defined when attached
+    public static final int SPECIFIC_LATER = -1;
+
 
     //stuff
     protected Context mContext;
-    protected ModulesView mParent;
+    private ModulesView mParent;
 
     //properties
-    protected int mLeft, mTop, mRight, mBottom;
+    private int mLeft, mTop, mRight, mBottom;
+    protected int mBoundLeft, mBoundTop, mBoundRight, mBoundBottom;
     protected int mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom;
 
     protected Drawable mBackgroundDrawable;
@@ -50,22 +55,37 @@ public class Module {
 
     //-------------------getter & setter----------
 
-    public int getLeft() {
+    protected int getLeft() {
         return mLeft;
     }
 
-    public int getTop() {
+    protected int getTop() {
         return mTop;
     }
 
-    public int getRight() {
+    protected int getRight() {
         return mRight;
     }
 
-    public int getBottom() {
+    protected int getBottom() {
         return mBottom;
     }
 
+    public int getBoundLeft() {
+        return mBoundLeft;
+    }
+
+    public int getBoundTop() {
+        return mBoundTop;
+    }
+
+    public int getBoundRight() {
+        return mBoundRight;
+    }
+
+    public int getBoundBottom() {
+        return mBoundBottom;
+    }
 
     public int getPaddingLeft() {
         return mPaddingLeft;
@@ -110,7 +130,6 @@ public class Module {
         mPaddingLeft = mPaddingTop = mPaddingRight = mPaddingBottom = padding;
     }
 
-
     public void setOnClickListener(OnClickListener onClickListener) {
         mOnClickListener = onClickListener;
     }
@@ -118,7 +137,6 @@ public class Module {
     public void setOnLongClickListener(OnLongClickListener onLongClickListener) {
         mOnLongClickListener = onLongClickListener;
     }
-
 
     public void setBackgroundBitmap(Bitmap backgroundBitmap) {
         clearBackground();
@@ -134,7 +152,6 @@ public class Module {
         mBackgroundDrawable = backgroundDrawable;
     }
 
-
     public void setBackgroundColor(int backgroundColor) {
         clearBackground();
         mBackgroundDrawable = new ColorDrawable(backgroundColor);
@@ -145,30 +162,27 @@ public class Module {
     }
 
 
-    public void translate(int x, int y){
-        if(mTop >= 0)
-            mTop +=y;
-        if(mBottom >= 0)
-            mBottom +=y;
-        if(mLeft>=0)
-            mLeft+=x;
-        if(mRight>=0)
-            mRight +=x;
-    }
     //--------------config region-------------
-
 
     final public void setBounds(int left, int top, int right, int bottom) {
         mLeft = left;
         mRight = right;
         mBottom = bottom;
         mTop = top;
+
+        onSetBounds(left, top, right, bottom);
+    }
+
+    protected void onSetBounds(int left, int top, int right, int bottom) {
+        mBoundLeft = left > 0? left : 0;
+        mBoundTop = top > 0? top : 0;
+        mBoundRight = right > 0? right : 0;
+        mBoundBottom = bottom > 0 ? bottom : 0;
     }
 
     public void configModule() {
+        onSetBounds(mLeft, mTop, mRight, mBottom);
     }
-
-
 
     protected void draw(Canvas canvas) {
         drawBackdround(canvas);
@@ -182,7 +196,6 @@ public class Module {
             }
         }
     }
-
 
     //handle event
 
@@ -208,7 +221,7 @@ public class Module {
             case MotionEvent.ACTION_UP: {
                 cancelLongClickWaiting();
                 handled = clickable();
-                if (clickable() && mOnClickListener != null)
+                if (clickable())
                     performClick();
                 break;
             }

@@ -254,8 +254,8 @@ public class ModulesView extends View {
         int x = (int) (event.getX() - getX());
         int y = (int) (event.getY() - getX());
 
-        return x < module.getRight() && x > module.getLeft()
-                && y > module.getTop() && y < module.getBottom();
+        return x < module.getBoundRight() && x > module.getBoundLeft()
+                && y > module.getBoundTop() && y < module.getBoundBottom();
     }
 
 

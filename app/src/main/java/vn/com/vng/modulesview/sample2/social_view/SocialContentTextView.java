@@ -62,7 +62,7 @@ public class SocialContentTextView extends ModulesView {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         configModulesOnMeasure();
-        setMeasureDimension(getMeasuredWidth(), mTextContent.getBottom());
+        setMeasureDimension(getMeasuredWidth(), mTextContent.getBoundBottom());
     }
 
     private void configModulesOnMeasure() {
@@ -77,7 +77,6 @@ public class SocialContentTextView extends ModulesView {
             mTextContent.setText(model.getContent());
         else
             mTextContent.setText(null);
-        mTextContent.setBounds(mTextContent.getLeft(), mTextContent.getTop(), mTextContent.getRight(), Module.SPECIFIC_LATER);
         mTextContent.configModule();
     }
 }

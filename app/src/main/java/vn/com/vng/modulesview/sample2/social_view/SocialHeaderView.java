@@ -109,9 +109,9 @@ public class SocialHeaderView extends ModulesView {
     private void staticConfigModules() {
         mAvaImgModule.setBounds(mAvaMargin, mAvaMargin, mAvaMargin + mAvaSize, mAvaMargin + mAvaSize);
 
-        mNameTextModule.setBounds(mAvaImgModule.getRight() + mAvaMargin, mAvaImgModule.getTop(), Module.SPECIFIC_LATER, Module.SPECIFIC_LATER);
+        mNameTextModule.setBounds(mAvaImgModule.getBoundRight() + mAvaMargin, mAvaImgModule.getBoundTop(), Module.SPECIFIC_LATER, Module.SPECIFIC_LATER);
         mNameTextModule.configModule();
-        mTimeTextModule.setBounds(mNameTextModule.getLeft(), mNameTextModule.getBottom(), Module.SPECIFIC_LATER, Module.SPECIFIC_LATER);
+        mTimeTextModule.setBounds(mNameTextModule.getBoundLeft(), mNameTextModule.getBoundBottom(), Module.SPECIFIC_LATER, Module.SPECIFIC_LATER);
         mTimeTextModule.configModule();
     }
 
@@ -143,11 +143,7 @@ public class SocialHeaderView extends ModulesView {
 
     private void reConfig() {
         mAvaImgModule.configModule();
-
-        mNameTextModule.setBounds(mNameTextModule.getLeft(), mNameTextModule.getTop(), Module.SPECIFIC_LATER, Module.SPECIFIC_LATER);
         mNameTextModule.configModule();
-
-        mTimeTextModule.setBounds(mTimeTextModule.getLeft(), mTimeTextModule.getTop(), Module.SPECIFIC_LATER, Module.SPECIFIC_LATER);
         mTimeTextModule.configModule();
     }
 

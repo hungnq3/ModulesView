@@ -115,57 +115,8 @@ public class ImageModule extends Module {
     }
 
 
-    private void drawOnCacheBitmap() {
-        if (mDrawable == null)
-            return;
-        ;
-        int width = mRight - mLeft - mPaddingLeft - mPaddingRight;
-        int height = mBottom - mTop - mPaddingTop - mPaddingBottom;
-        if (width > 0 && height > 0) {
-            createCacheBitmapIfNeeded(width, height);
-            Canvas canvas = new Canvas(mCachedBitmap);
-
-            //anti alias if needed
-            if (needAntiAlias()) {
-                canvas.drawPath(mClipPath, mAntiAliasPaint);
-            }
-            //clip drawing region
-            if (!mClipPath.isEmpty())
-                canvas.clipPath(mClipPath);
-            //draw canvas with matrix
-            if (mDrawMatrix != null)
-                canvas.concat(mDrawMatrix);
-            mDrawable.draw(canvas);
-        }
-    }
-
-    private void createCacheBitmapIfNeeded(int width, int height) {
-        if (Build.VERSION.SDK_INT >= 19) {
-            try {
-                mCachedBitmap.reconfigure(width, height, mCachedBitmap.getConfig());
-            } catch (Exception e) {
-                mCachedBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            }
-        } else {
-            mCachedBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        }
-    }
-
-
     //copy a part of ImageView.configureBounds(()
     private void configureImageBounds() {
-
-
-        //resolve specific_later params
-        if (mLeft == SPECIFIC_LATER)
-            mLeft = 0;
-        if (mTop == SPECIFIC_LATER)
-            mTop = 0;
-        if (mRight == SPECIFIC_LATER)
-            mRight = 0;
-        if (mBottom == SPECIFIC_LATER)
-            mBottom = 0;
-
         if (mDrawable == null) {
             return;
         }
@@ -173,8 +124,8 @@ public class ImageModule extends Module {
         final int dwidth = mDrawableWidth;
         final int dheight = mDrawableHeight;
 
-        final int vwidth = mRight - mLeft - mPaddingLeft - mPaddingRight;
-        final int vheight = mBottom - mTop - mPaddingTop - mPaddingBottom;
+        final int vwidth = mBoundRight - mBoundLeft - mPaddingLeft - mPaddingRight;
+        final int vheight = mBoundBottom - mBoundTop  - mPaddingTop - mPaddingBottom;
 
         final boolean fits = (dwidth < 0 || vwidth == dwidth)
                 && (dheight < 0 || vheight == dheight);
@@ -246,8 +197,8 @@ public class ImageModule extends Module {
     private void configureClipBounds() {
         if (mDrawable != null) {
             mClipPath.reset();
-            int width = mRight - mLeft - mPaddingRight - mPaddingLeft;
-            int height = mBottom - mTop - mPaddingBottom - mPaddingTop;
+            int width = mBoundRight - mBoundLeft - mPaddingRight - mPaddingLeft;
+            int height = mBoundBottom - mBoundTop - mPaddingBottom - mPaddingTop;
             mCLipRect.set(0, 0, width, height);
             if (mRoundCorner == ROUND_CIRCLE) {
                 float halfWidth = width / 2f;
@@ -262,6 +213,47 @@ public class ImageModule extends Module {
         }
     }
 
+
+//
+//    private void drawOnCacheBitmap() {
+//        if (mDrawable == null)
+//            return;
+//        ;
+//        int width = mBoundRight - mBoundLeft - mPaddingLeft - mPaddingRight;
+//        int height = mBoundBottom - mBoundTop - mPaddingTop - mPaddingBottom;
+//        if (width > 0 && height > 0) {
+//            createCacheBitmapIfNeeded(width, height);
+//            Canvas canvas = new Canvas(mCachedBitmap);
+//
+//            //anti alias if needed
+//            if (needAntiAlias()) {
+//                canvas.drawPath(mClipPath, mAntiAliasPaint);
+//            }
+//            //clip drawing region
+//            if (!mClipPath.isEmpty())
+//                canvas.clipPath(mClipPath);
+//            //draw canvas with matrix
+//            if (mDrawMatrix != null)
+//                canvas.concat(mDrawMatrix);
+//            mDrawable.draw(canvas);
+//        }
+//    }
+//
+//    private void createCacheBitmapIfNeeded(int width, int height) {
+//        if (Build.VERSION.SDK_INT >= 19) {
+//            try {
+//                mCachedBitmap.reconfigure(width, height, mCachedBitmap.getConfig());
+//            } catch (Exception e) {
+//                mCachedBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+//            }
+//        } else {
+//            mCachedBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+//        }
+//    }
+
+
+
+    
     @Override
     protected void draw(Canvas canvas) {
         super.draw(canvas);
@@ -277,8 +269,8 @@ public class ImageModule extends Module {
         canvas.save();
 
 //        translate if needed
-        int translateLeft = mLeft + mPaddingLeft;
-        int translateTop = mTop + mPaddingTop;
+        int translateLeft = mBoundLeft + mPaddingLeft;
+        int translateTop = mBoundTop + mPaddingTop;
         if (translateLeft > 0 || translateTop > 0)
             canvas.translate(translateLeft, translateTop);
 

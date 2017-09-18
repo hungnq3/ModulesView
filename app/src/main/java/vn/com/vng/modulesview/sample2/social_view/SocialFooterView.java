@@ -153,7 +153,7 @@ public class SocialFooterView extends ModulesView {
 
         mImgLike.setBounds(0, mFooterMarginTop, mLikeImgSize, mFooterMarginTop + mFooterHeight);
 
-        int textLikeLeft = mImgLike.getRight();
+        int textLikeLeft = mImgLike.getBoundRight();
         mTextLike.setBounds(textLikeLeft, mFooterMarginTop, textLikeLeft + mLikeTextWidth, mFooterMarginTop + mFooterHeight);
         mTextLike.configModule();
         //re bound text like to vertical center
@@ -161,10 +161,10 @@ public class SocialFooterView extends ModulesView {
         int textLikeMarginTop = Math.max((mFooterHeight - textLikeHeight) / 2, 0);
         mTextLike.setBounds(textLikeLeft, mFooterMarginTop + textLikeMarginTop, textLikeLeft + mLikeTextWidth, mFooterMarginTop + textLikeMarginTop + mFooterHeight);
 
-        int imgCommentLeft = mTextLike.getRight();
+        int imgCommentLeft = mTextLike.getBoundRight();
         mImgComment.setBounds(imgCommentLeft, mFooterMarginTop, imgCommentLeft + mCommentImgSize, mFooterMarginTop + mFooterHeight);
 
-        int textCommentLeft = mImgComment.getRight();
+        int textCommentLeft = mImgComment.getBoundRight();
         mTextComment.setBounds(textCommentLeft, mFooterMarginTop + textLikeMarginTop, textCommentLeft + mCommentTextWidth, mFooterMarginTop + textLikeMarginTop + mFooterHeight);
 
         mImgLike.configModule();

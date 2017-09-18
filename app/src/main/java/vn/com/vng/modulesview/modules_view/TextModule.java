@@ -161,38 +161,25 @@ public class TextModule extends Module {
     }
 
     private void buildTextLayout() {
-        //resolve specific later params
-        if (mLeft == SPECIFIC_LATER)
-            mLeft = 0;
-        if (mTop == SPECIFIC_LATER)
-            mTop = 0;
-//        if (mRight == SPECIFIC_LATER) {
-//            if (getParent() != null)
-//                mRight = mParent.getWidth();
-//            else
-//                mRight = 0;
-//        }
-
-        int textWidth = Math.max(mRight - mLeft - mPaddingLeft - mPaddingRight, 0);
+        int textWidth = Math.max(mBoundRight - mBoundLeft - mPaddingLeft - mPaddingRight, 0);
         //build a layout to calculate text width and height
         mTextLayout = buildTextLayout(textWidth);
 
-        if (mBottom == SPECIFIC_LATER) {
+        if (getBottom() == SPECIFIC_LATER) {
             int textHeight = mTextLayout.getHeight();
-            mBottom = mTop + textHeight + mPaddingTop + mPaddingBottom;
+            mBoundBottom = mBoundTop + textHeight + mPaddingTop + mPaddingBottom;
         }
 
-        if (mRight == SPECIFIC_LATER) {
+        if (getRight() == SPECIFIC_LATER) {
             textWidth = mTextLayout.getWidth();
-            mRight = mLeft + textWidth + mPaddingLeft + mPaddingRight;
+            mBoundRight = mBoundLeft + textWidth + mPaddingLeft + mPaddingRight;
         }
-
     }
 
 
     private void configClipBounds() {
-        int width = mRight - mLeft;
-        int height = mBottom - mTop;
+        int width = mBoundRight - mBoundLeft;
+        int height = mBoundBottom - mBoundTop;
         mClipRect.set(0, 0, width, height);
     }
 
@@ -231,8 +218,8 @@ public class TextModule extends Module {
         canvas.save();
 
         //translate if needed
-        int translateLeft = mLeft + mPaddingLeft;
-        int translateTop = mTop + mPaddingTop;
+        int translateLeft = mBoundLeft + mPaddingLeft;
+        int translateTop = mBoundTop + mPaddingTop;
         if (translateLeft > 0 || translateTop > 0)
             canvas.translate(translateLeft, translateTop);
 

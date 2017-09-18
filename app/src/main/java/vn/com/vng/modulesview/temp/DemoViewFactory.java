@@ -113,16 +113,13 @@ public class DemoViewFactory {
                 int widthSize = View.MeasureSpec.getSize(withMeasureSpec);
 
                 //init header region
-                textName.setBounds(avaMargin * 2 + avaSize, textNameMargin, widthSize - textNameMargin, Module.SPECIFIC_LATER);
                 textName.configModule();
 
-                textTime.setBounds(textName.getLeft(), textName.getBottom(), widthSize - textNameMargin, Module.SPECIFIC_LATER);
                 textTime.configModule();
 
                 //init content
-                textContent.setBounds(0, headerHeight, widthSize, Module.SPECIFIC_LATER);
                 textContent.configModule();
-                int contentHeight = textContent.getBottom() - textContent.getTop();
+                int contentHeight = textContent.getBoundBottom() - textContent.getBoundTop();
 
                 //init image region
                 int imgRegionTop = headerHeight + contentHeight;
