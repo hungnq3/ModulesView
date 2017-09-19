@@ -1,34 +1,42 @@
 package vn.com.vng.modulesview.modules_view;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
-import android.graphics.Region;
-import android.graphics.Xfermode;
+import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
+import android.support.annotation.IntDef;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * Created by HungNQ on 08/09/2017.
  */
 
 public class ImageModule extends Module {
+    private static final Bitmap.Config BITMAP_CONFIG = Bitmap.Config.ARGB_8888;
+    private static final int COLORDRAWABLE_DIMENSION = 1;
 
     /**
      * Options for scaling the bounds of an image to the bounds of this view.
      */
-    public enum ScaleType {
-        FIT_XY,
-        FIT_CENTER,
-        CENTER,
-        CENTER_CROP,
-        CENTER_INSIDE
+
+    public static final int FIT_CENTER = 0;
+    public static final int FIT_XY = 2;
+    public static final int CENTER = 3;
+    public static final int CENTER_CROP = 4;
+    public static final int CENTER_INSIDE = 5;
+
+    @IntDef({FIT_CENTER, FIT_XY, CENTER, CENTER_CROP, CENTER_INSIDE})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface ScaleType {
     }
 
     public static final int ROUND_CIRCLE = -1;
@@ -39,38 +47,39 @@ public class ImageModule extends Module {
     }
 
     private void init() {
-        mMatrix = new Matrix();
-        mScaleType = ScaleType.FIT_CENTER;
     }
 
 
-    //stuff
-    private Drawable mDrawable;
-    private Matrix mDrawMatrix, mMatrix;
-    private int mDrawableWidth, mDrawableHeight;
-    private Bitmap mCachedBitmap;
+    //----------stuff-------------------------
+    private Matrix mDrawMatrix;
+    private Matrix mMatrix = new Matrix();
+    private final Paint mBitmapPaint = new Paint();
+    private BitmapShader mBitmapShader;
 
-    // Avoid allocations...
-    private final RectF mTempSrc = new RectF();
-    private final RectF mTempDst = new RectF();
+    //draw region
+    private int mDrawWidth, mDrawHeight;
+    private int mDrawTranslateX, mDrawTranslateY;
     private final RectF mCLipRect = new RectF();
     private final Path mClipPath = new Path();
-    private final Paint mAntiAliasPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-
 
     //properties
-    private ScaleType mScaleType;
+    private Bitmap mBitmap;
+    private
+    @ScaleType
+    int mScaleType;
     private float mRoundCorner;
-    private boolean mShouldCacheBitmap;
+
 
     //-------------getter & setter----------------------
 
 
-    public ScaleType getScaleType() {
+    public
+    @ScaleType
+    int getScaleType() {
         return mScaleType;
     }
 
-    public void setScaleType(ScaleType scaleType) {
+    public void setScaleType(@ScaleType int scaleType) {
         if (mScaleType != scaleType) {
             mScaleType = scaleType;
             configureImageBounds();
@@ -84,23 +93,22 @@ public class ImageModule extends Module {
     public void setRoundCorner(float roundCorner) {
         if (mRoundCorner != roundCorner) {
             mRoundCorner = roundCorner;
-            configureClipBounds();
+            configureDrawRegionPath();
         }
     }
 
-    public void setBitmap(Bitmap bitmap) {
-        setImageDrawable(new BitmapDrawable(mContext != null ? mContext.getResources() : null, bitmap));
+    public void setImageDrawable(Drawable drawable) {
+        setBitmap(getBitmapFromDrawable(drawable));
     }
 
-    public void setImageDrawable(Drawable drawable) {
-        mDrawable = drawable;
-        if (drawable != null) {
-            mDrawableWidth = mDrawable.getIntrinsicWidth();
-            mDrawableHeight = mDrawable.getIntrinsicHeight();
-            configureImageBounds();
-        } else {
-            mDrawableWidth = -1;
-            mDrawableHeight = -1;
+    public void setBitmap(Bitmap bitmap) {
+        mBitmap = bitmap;
+        if(mBitmap != null) {
+            mBitmapShader = new BitmapShader(mBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+            mBitmapPaint.setShader(mBitmapShader);
+        }else{
+            mBitmapShader = null;
+            mBitmapPaint.setShader(null);
         }
     }
 
@@ -111,205 +119,221 @@ public class ImageModule extends Module {
     public void configModule() {
         super.configModule();
         configureImageBounds();
-        configureClipBounds();
+        configureDrawRegionPath();
+        configureBitmapPaint();
     }
 
 
     //copy a part of ImageView.configureBounds(()
     private void configureImageBounds() {
-        if (mDrawable == null) {
+        if (mBitmap == null) {
             return;
         }
 
-        final int dwidth = mDrawableWidth;
-        final int dheight = mDrawableHeight;
+        final int iWidth = mBitmap.getWidth();
+        final int iHeight = mBitmap.getHeight();
 
-        final int vwidth = mBoundRight - mBoundLeft - mPaddingLeft - mPaddingRight;
-        final int vheight = mBoundBottom - mBoundTop  - mPaddingTop - mPaddingBottom;
+        final int vWidth = mBoundRight - mBoundLeft - mPaddingLeft - mPaddingRight;
+        final int vHeight = mBoundBottom - mBoundTop - mPaddingTop - mPaddingBottom;
 
-        final boolean fits = (dwidth < 0 || vwidth == dwidth)
-                && (dheight < 0 || vheight == dheight);
+        final boolean fits = vWidth == iWidth && vHeight == iHeight;
 
-        if (dwidth <= 0 || dheight <= 0 || ScaleType.FIT_XY == mScaleType) {
+        if (FIT_XY == mScaleType) {
             /* If the drawable has no intrinsic size, or we're told to
                 scaletofit, then we just fill our entire view.
             */
-            mDrawable.setBounds(0, 0, vwidth, vheight);
-            mDrawMatrix = null;
+            mDrawMatrix = mMatrix;
+            float scaleX = vWidth / (float) iWidth;
+            float scaleY = vHeight / (float) iHeight;
+            mDrawMatrix.setScale(scaleX, scaleY);
+
+            //determine draw region
+            mDrawWidth = vWidth;
+            mDrawHeight = vHeight;
+            mDrawTranslateX = mPaddingLeft;
+            mDrawTranslateY = mPaddingTop;
+
         } else {
             // We need to do the scaling ourself, so have the drawable
             // use its native size.
-            mDrawable.setBounds(0, 0, dwidth, dheight);
-
             if (fits) {
                 // The bitmap fits exactly, no transform needed.
                 mDrawMatrix = null;
-            } else if (mScaleType == ScaleType.CENTER) {
+
+                //determine draw region
+                mDrawWidth = vWidth;
+                mDrawHeight = vHeight;
+                mDrawTranslateX = mPaddingLeft;
+                mDrawTranslateY = mPaddingTop;
+            } else if (mScaleType == CENTER) {
                 // Center bitmap in view, no scaling.
                 mDrawMatrix = mMatrix;
-                mDrawMatrix.setTranslate(Math.round((vwidth - dwidth) * 0.5f),
-                        Math.round((vheight - dheight) * 0.5f));
-            } else if (mScaleType == ScaleType.CENTER_CROP) {
+                mDrawMatrix.setTranslate(Math.round((vWidth - iWidth) * 0.5f),
+                        Math.round((vHeight - iHeight) * 0.5f));
+
+                //determine draw region
+                mDrawWidth = vWidth;
+                mDrawHeight = vHeight;
+                mDrawTranslateX = mPaddingLeft;
+                mDrawTranslateY = mPaddingTop;
+
+            } else if (mScaleType == CENTER_CROP) {
                 mDrawMatrix = mMatrix;
 
                 float scale;
                 float dx = 0, dy = 0;
 
-                if (dwidth * vheight > vwidth * dheight) {
-                    scale = (float) vheight / (float) dheight;
-                    dx = (vwidth - dwidth * scale) * 0.5f;
+                if (iWidth * vHeight > vWidth * iHeight) {
+                    scale = (float) vHeight / (float) iHeight;
+                    dx = (vWidth - iWidth * scale) * 0.5f;
                 } else {
-                    scale = (float) vwidth / (float) dwidth;
-                    dy = (vheight - dheight * scale) * 0.5f;
+                    scale = (float) vWidth / (float) iWidth;
+                    dy = (vHeight - iHeight * scale) * 0.5f;
                 }
 
                 mDrawMatrix.setScale(scale, scale);
                 mDrawMatrix.postTranslate(Math.round(dx), Math.round(dy));
-            } else if (mScaleType == ScaleType.CENTER_INSIDE) {
+
+                //determine draw region
+                mDrawWidth = vWidth;
+                mDrawHeight = vHeight;
+                mDrawTranslateX = mPaddingLeft;
+                mDrawTranslateY = mPaddingTop;
+
+            } else if (mScaleType == CENTER_INSIDE) {
                 mDrawMatrix = mMatrix;
                 float scale;
                 float dx;
                 float dy;
 
-                if (dwidth <= vwidth && dheight <= vheight) {
+                if (iWidth <= vWidth && iHeight <= vHeight) {
                     scale = 1.0f;
                 } else {
-                    scale = Math.min((float) vwidth / (float) dwidth,
-                            (float) vheight / (float) dheight);
+                    scale = Math.min((float) vWidth / (float) iWidth,
+                            (float) vHeight / (float) iHeight);
                 }
 
-                dx = Math.round((vwidth - dwidth * scale) * 0.5f);
-                dy = Math.round((vheight - dheight * scale) * 0.5f);
+                dx = Math.round((vWidth - iWidth * scale) * 0.5f);
+                dy = Math.round((vHeight - iHeight * scale) * 0.5f);
 
                 mDrawMatrix.setScale(scale, scale);
-                mDrawMatrix.postTranslate(dx, dy);
+//                mDrawMatrix.postTranslate(dx, dy);
+
+                //determine draw region
+                mDrawWidth = (int) (iWidth * scale);
+                mDrawHeight = (int) (iHeight * scale);
+                mDrawTranslateX = mPaddingLeft + (int) dx;
+                mDrawTranslateY = mPaddingTop + (int) dy;
             } else { //FIT_CENTER
                 // Generate the required transform.
-                mTempSrc.set(0, 0, dwidth, dheight);
-                mTempDst.set(0, 0, vwidth, vheight);
+                float scale = Math.min((float) vWidth / (float) iWidth,
+                        (float) vHeight / (float) iHeight);
+                int dx = Math.round((vWidth - iWidth * scale) * 0.5f);
+                int dy = Math.round((vHeight - iHeight * scale) * 0.5f);
 
                 mDrawMatrix = mMatrix;
-                mDrawMatrix.setRectToRect(mTempSrc, mTempDst, Matrix.ScaleToFit.CENTER);
+                mDrawMatrix.setScale(scale, scale);
+//                mDrawMatrix.postTranslate(dx, dy);
+
+                //determine draw region
+                mDrawWidth = (int) (iWidth * scale);
+                mDrawHeight = (int) (iHeight * scale);
+                mDrawTranslateX = mPaddingLeft + dx;
+                mDrawTranslateY = mPaddingTop + dy;
             }
         }
     }
 
-    private void configureClipBounds() {
-        if (mDrawable != null) {
+    private void configureDrawRegionPath() {
+        if (mBitmap != null) {
             mClipPath.reset();
-            int width = mBoundRight - mBoundLeft - mPaddingRight - mPaddingLeft;
-            int height = mBoundBottom - mBoundTop - mPaddingBottom - mPaddingTop;
-            mCLipRect.set(0, 0, width, height);
             if (mRoundCorner == ROUND_CIRCLE) {
-                float halfWidth = width / 2f;
-                float halfHeight = height / 2f;
+                float halfWidth = mDrawWidth / 2f;
+                float halfHeight = mDrawHeight / 2f;
                 float radius = Math.min(halfWidth, halfHeight);
                 mClipPath.addCircle(halfWidth, halfHeight, radius, Path.Direction.CW);
             } else if (mRoundCorner > 0) {
+                mCLipRect.set(0, 0, mDrawWidth, mDrawHeight);
                 mClipPath.addRoundRect(mCLipRect, mRoundCorner, mRoundCorner, Path.Direction.CW);
             } else {
-                //...
+                mCLipRect.set(0, 0, mDrawWidth, mDrawHeight);
+                mClipPath.addRect(mCLipRect, Path.Direction.CW);
             }
         }
     }
 
 
-//
-//    private void drawOnCacheBitmap() {
-//        if (mDrawable == null)
-//            return;
-//        ;
-//        int width = mBoundRight - mBoundLeft - mPaddingLeft - mPaddingRight;
-//        int height = mBoundBottom - mBoundTop - mPaddingTop - mPaddingBottom;
-//        if (width > 0 && height > 0) {
-//            createCacheBitmapIfNeeded(width, height);
-//            Canvas canvas = new Canvas(mCachedBitmap);
-//
-//            //anti alias if needed
-//            if (needAntiAlias()) {
-//                canvas.drawPath(mClipPath, mAntiAliasPaint);
-//            }
-//            //clip drawing region
-//            if (!mClipPath.isEmpty())
-//                canvas.clipPath(mClipPath);
-//            //draw canvas with matrix
-//            if (mDrawMatrix != null)
-//                canvas.concat(mDrawMatrix);
-//            mDrawable.draw(canvas);
-//        }
-//    }
-//
-//    private void createCacheBitmapIfNeeded(int width, int height) {
-//        if (Build.VERSION.SDK_INT >= 19) {
-//            try {
-//                mCachedBitmap.reconfigure(width, height, mCachedBitmap.getConfig());
-//            } catch (Exception e) {
-//                mCachedBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-//            }
-//        } else {
-//            mCachedBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-//        }
-//    }
+    private void configureBitmapPaint() {
+        if (mBitmap != null) {
+            if (mDrawMatrix != null)
+                mBitmapShader.setLocalMatrix(mDrawMatrix);
+            mBitmapPaint.setAntiAlias(needToAntialias());
+        }
+    }
+
+    private boolean needToAntialias() {
+        return mRoundCorner != ROUND_NONE;
+    }
 
 
-
-    
     @Override
     protected void draw(Canvas canvas) {
         super.draw(canvas);
 
-        if (mDrawable == null) {
+        if (mBitmap == null) {
             return;
         }
-        if (mDrawableWidth == 0 || mDrawableHeight == 0) {
+        if (mBitmap.getHeight() == 0 || mBitmap.getHeight() == 0) {
             return;
         }
-
-        //NQH: this action maybe slow down the draw action
-        canvas.save();
 
 //        translate if needed
-        int translateLeft = mBoundLeft + mPaddingLeft;
-        int translateTop = mBoundTop + mPaddingTop;
-        if (translateLeft > 0 || translateTop > 0)
-            canvas.translate(translateLeft, translateTop);
+        int translateLeft = mBoundLeft + mDrawTranslateX;
+        int translateTop = mBoundTop + mDrawTranslateY;
+        boolean needToSave = translateLeft > 0 || translateTop > 0;
 
-        //anti alias if needed
-        if (needAntiAlias()) {
-//            canvas.save();
-//            canvas.clipPath(mClipPath, Region.Op.DIFFERENCE);
-            canvas.drawPath(mClipPath, mAntiAliasPaint);
-//            canvas.restore();
+        if (needToSave) {
+            canvas.save();
+            canvas.translate(translateLeft, translateTop);
         }
 
-        //clip drawing region
-        if (mClipPath.isEmpty())
-            canvas.clipRect(mCLipRect);
-        else
-            canvas.clipPath(mClipPath);
+        canvas.drawPath(mClipPath, mBitmapPaint);
 
-        //draw canvas with matrix
-        if (mDrawMatrix != null)
-            canvas.concat(mDrawMatrix);
-
-        mDrawable.draw(canvas);
-
-        //NQH: this action will be slow down the draw action
-        canvas.restore();
-
-
-//        if(mCachedBitmap == null)
-//            drawOnCacheBitmap();
-//
-//        if (mCachedBitmap != null)
-//            canvas.drawBitmap(mCachedBitmap, mLeft + mPaddingLeft, mTop + mPaddingTop, mAntiAliasPaint);
-
-
+        if (needToSave)
+            canvas.restore();
     }
 
 
     private boolean needAntiAlias() {
         return mRoundCorner > 0 || mRoundCorner == ROUND_CIRCLE;
+    }
+
+
+    private Bitmap getBitmapFromDrawable(Drawable drawable) {
+        if (drawable == null) {
+            return null;
+        }
+
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable) drawable).getBitmap();
+        }
+
+        try {
+            Bitmap bitmap;
+            if (drawable instanceof ColorDrawable) {
+                bitmap = Bitmap.createBitmap(COLORDRAWABLE_DIMENSION, COLORDRAWABLE_DIMENSION, BITMAP_CONFIG);
+            } else {
+                bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), BITMAP_CONFIG);
+            }
+
+            Canvas canvas = new Canvas(bitmap);
+            drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+            drawable.draw(canvas);
+            return bitmap;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

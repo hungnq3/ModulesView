@@ -32,8 +32,9 @@ public class Social3ImageContentView extends SocialImageContentView {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
+
     @Override
-    protected int getImagesContentCount() {
+    public int getImagesContentCount() {
         return 3;
     }
 

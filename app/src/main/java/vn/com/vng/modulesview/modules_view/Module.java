@@ -3,14 +3,11 @@ package vn.com.vng.modulesview.modules_view;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
-import android.util.Log;
 import android.view.MotionEvent;
-import android.widget.Toast;
 
 /**
  * Created by HungNQ on 08/09/2017.
@@ -20,7 +17,7 @@ public class Module {
     private static final long LONG_CLICK_TIME = 500;
 
     //if a bound (left, top, right, bottom) can not determine , let put SPECIFIC_LATER.
-    //Depend on each module, bounds will be defined when attached
+    //Depend on each module, bounds will be defined when the module call configModule()
     public static final int SPECIFIC_LATER = -1;
 
 
@@ -28,15 +25,37 @@ public class Module {
     protected Context mContext;
     private ModulesView mParent;
 
-    //properties
+    //real area occupied
+
+    //properties:
+    //Bounds of a module is expressed with 4 values mLeft, mTop, mRight and mBottom, which determine by call setBounds(left, top, right, bottom)
+    //For each bound, it can specify an exact number or SPECIFIC_LATER,
+    // which means that the module will be specify when config.
+    //Example: A TextModule can call setBounds(0,0,SPECIFIC_LATER,SPECIFIC_LATER) which mean
+    //right and bottom bounds will fit the text when the TextModule call configModule().
+    //And then the real bounds of element pass 4 values mBoundLeft, mBoundTop, mBoundRight, mBoundBottom
     private int mLeft, mTop, mRight, mBottom;
+
+    //This is real bounds of module, where the module r eallylocated in the parent and how big it is.
+    //Which be determined after configModule() called, depends on specific module that is definitely difference
+    //For example:
+    //with TextModule:
+    //mLeft = SPECIFIC_LATER -> mBoundLeft = 0;
+    //mTop = SPECIFIC_LATER -> mBoundTop = 0;
+    //mRight = SPECIFIC_LATER -> mBoundRight = the value that fit the text width and padding;
+    //mBottom = SPECIFIC_LATER -> mBoundRight = the value that fit the text height and padding;
+    // with ImageModule:
+    // SPECIFIC_LATER -> 0 for all bounds.
     protected int mBoundLeft, mBoundTop, mBoundRight, mBoundBottom;
+
+
     protected int mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom;
 
     protected Drawable mBackgroundDrawable;
 
     private OnClickListener mOnClickListener;
     private OnLongClickListener mOnLongClickListener;
+    private OnTouchListener mOnTouchListener;
 
 
     public ModulesView getParent() {
@@ -164,14 +183,23 @@ public class Module {
 
     //--------------config region-------------
 
+
+    //call to initiate the module's layout
     final public void setBounds(int left, int top, int right, int bottom) {
         mLeft = left;
         mRight = right;
         mBottom = bottom;
         mTop = top;
-
-        onSetBounds(left, top, right, bottom);
+        onSetBounds(mLeft, mTop, mRight, mBottom);
     }
+
+
+    //you must call and recall configModule() when module's properties have changed to let module configs and prepares stuffs and layout for drawing.
+    //if you don't, module maybe drawing the previous state although you changed some module's properties.
+    public void configModule() {
+        onSetBounds(mLeft, mTop, mRight, mBottom);
+    }
+
 
     protected void onSetBounds(int left, int top, int right, int bottom) {
         mBoundLeft = left > 0? left : 0;
@@ -180,25 +208,23 @@ public class Module {
         mBoundBottom = bottom > 0 ? bottom : 0;
     }
 
-    public void configModule() {
-        onSetBounds(mLeft, mTop, mRight, mBottom);
-    }
 
+
+    //this method was called in ModuleView parent to let module draw on the canvas of parent view.
     protected void draw(Canvas canvas) {
-        drawBackdround(canvas);
+        drawBackground(canvas);
     }
 
-    protected void drawBackdround(Canvas canvas) {
+    protected void drawBackground(Canvas canvas) {
         if (canvas != null && mBackgroundDrawable != null) {
-            if (mLeft >= 0 && mTop >= 0 && mRight > 0 && mBottom > 0) {
-                mBackgroundDrawable.setBounds(mLeft, mTop, mRight, mBottom);
+            if (mBoundLeft >= 0 && mBoundTop >= 0 && mBoundRight > 0 && mBoundBottom > 0) {
+                mBackgroundDrawable.setBounds(mBoundLeft, mBoundTop, mBoundRight, mBoundBottom);
                 mBackgroundDrawable.draw(canvas);
             }
         }
     }
 
     //handle event
-
     public boolean clickable() {
         return mOnClickListener != null;
     }
@@ -220,7 +246,7 @@ public class Module {
 
             case MotionEvent.ACTION_UP: {
                 cancelLongClickWaiting();
-                handled = clickable();
+                handled = clickable() || handleTouchEvent(e);
                 if (clickable())
                     performClick();
                 break;
@@ -230,16 +256,21 @@ public class Module {
                 break;
             }
         }
-        return handled;
+        return handleTouchEvent(e) || handled;
     }
 
+
+    protected boolean handleTouchEvent(MotionEvent event){
+        if(mOnTouchListener != null)
+            return mOnTouchListener.onTouch(this, event);
+       return false;
+    }
     private Handler mLongClickTriggerHandler;
     private Runnable mLongClickTriggerRunnable = new Runnable() {
         @Override
         public void run() {
             performLongClick();
-
-            //trigger cancel touch event to parent
+            //trigger a cancel touch event to parent view after long click
             if (mParent != null)
                 mParent.onTouchEvent(MotionEvent.obtain(0, 0, MotionEvent.ACTION_CANCEL, getLeft(), getTop(), 0));
         }
@@ -263,17 +294,22 @@ public class Module {
     }
 
 
-    private void performLongClick() {
+    public void performLongClick() {
         if (mOnLongClickListener != null)
             mOnLongClickListener.onLongClick(this);
     }
 
-    private void performClick() {
+    public void performClick() {
         if (mOnClickListener != null)
             mOnClickListener.onClick(this);
     }
 
 
+
+    public void invalidate(){
+        if(mParent != null)
+            mParent.invalidateChild(this);
+    }
     //-------------interface region--------------------
     public interface OnClickListener {
         void onClick(Module module);
@@ -281,6 +317,18 @@ public class Module {
 
     public interface OnLongClickListener {
         void onLongClick(Module module);
+    }
+
+    public interface OnTouchListener{
+        boolean onTouch(Module module, MotionEvent event);
+    }
+
+    public OnTouchListener getOnTouchListener() {
+        return mOnTouchListener;
+    }
+
+    public void setOnTouchListener(OnTouchListener onTouchListener) {
+        mOnTouchListener = onTouchListener;
     }
 
     //--------------endregion--------------------------

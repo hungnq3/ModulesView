@@ -33,7 +33,7 @@ public class Social7ImageContentView extends SocialImageContentView {
     }
 
     @Override
-    protected int getImagesContentCount() {
+    public int getImagesContentCount() {
         return 7;
     }
 

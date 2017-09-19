@@ -55,8 +55,10 @@ public class MainActivity extends AppCompatActivity {
         Bitmap img7 = BitmapFactory.decodeResource(getResources(), R.drawable.img7);
         Bitmap img8 = BitmapFactory.decodeResource(getResources(), R.drawable.img8);
         Bitmap img9 = BitmapFactory.decodeResource(getResources(), R.drawable.img9);
+        Bitmap img10 = BitmapFactory.decodeResource(getResources(), R.drawable.img10);
 
         List<BaseViewItem> items = new ArrayList<>(40);
+        items.addAll(mockModel(img10, "Thổ dân", "12:07 Hôm nay", "Hello \n... \n... \n... \nmotor", 1022, 6233));
         items.addAll(mockModel(img1, "Cú vọ", "12:07 Hôm qua", "Cả cả cả mọi người trên thể giới ra đây mà xem", 5, 0, img1, img2));
         items.addAll(mockModel(img2, "Cú xám", "11:08 Hôm qua", "Cả cả cả mọi người trên thể giới ra đây mà xem, ra mà xem, ra mà xem, ra hết đây mà xem đê!!!", 12, 1, img1, img4, img2));
         items.addAll(mockModel(img3, "Cú cu", "10:07 Hôm qua", "Cả cả cả mọi người trên thể giới ra đây!!!", 5, 12));
@@ -72,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         items.addAll(mockModel(img4, "Cú cháu", "07:02 Hôm qua", "Cả cả cả mọi người trên thể giới ra đây mà xem, ra mà xem, ra mà xem, ra hết đây mà xem đê!!!", 15, 42, img2));
         items.addAll(mockModel(img3, "Cú chắc", "06:07 Hôm qua", "Cả cả cả mọi người trên thể giới ra đây mà xem, ra mà xem, ra mà xem, ra hết đây mà xem đê, ra mà xem, ra mà xem, ra hết đây mà xem đê!!!", 12, 26, img3, img2, img1));
         items.addAll(mockModel(img3, "Cú chắc", "06:07 Hôm qua", "Cả cả cả mọi người trên thể giới ra đây mà xem, ra mà xem, ra mà xem, ra hết đây mà xem đê, ra mà xem, ra mà xem, ra hết đây mà xem đê!!!", 12, 26, img3, img2, img1, img4, img5, img6));
+        items.addAll(mockModel(img3, "Cú chắc", "06:07 Hôm qua", "Cả cả cả mọi người trên thể giới ra đây mà xem, ra mà xem, ra mà xem, ra hết đây mà xem đê, ra mà xem, ra mà xem, ra hết đây mà xem đê!!!", 12, 26, img3, img3, img3, img3, img3, img3));
 
 
         //double
@@ -91,6 +94,8 @@ public class MainActivity extends AppCompatActivity {
         items.addAll(mockModel(img3, "Cú chắc", "06:07 Hôm qua", "Cả cả cả mọi người trên thể giới ra đây mà xem, ra mà xem, ra mà xem, ra hết đây mà xem đê, ra mà xem, ra mà xem, ra hết đây mà xem đê!!!", 12, 26, img3, img2, img1));
         items.addAll(mockModel(img3, "Cú chắc", "06:07 Hôm qua", "Cả cả cả mọi người trên thể giới ra đây mà xem, ra mà xem, ra mà xem, ra hết đây mà xem đê, ra mà xem, ra mà xem, ra hết đây mà xem đê!!!", 12, 26, img3, img2, img1, img4, img5, img6));
 
+
+        items.addAll(mockModel(img1, "Cú vọ", "12:07 Hôm qua", "Cả cả cả mọi người trên thể giới ra đây mà xem", 5, 0, img1, img1, img1, img1, img1, img1));
 
         return items;
     }

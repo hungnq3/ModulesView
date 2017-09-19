@@ -208,7 +208,6 @@ public class TextModule extends Module {
             textPaint.setTextSize(mTextSize);
             layout = new StaticLayout("", textPaint, width, mAlignment, mTextLayoutBuilder.getTextSpacingMultiplier(), mTextLayoutBuilder.getTextSpacingExtra(), false);
         }
-
         return layout;
     }
 
@@ -231,6 +230,5 @@ public class TextModule extends Module {
 
         canvas.restore();
     }
-
 
 }

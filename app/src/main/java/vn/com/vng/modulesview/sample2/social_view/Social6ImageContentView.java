@@ -33,7 +33,7 @@ public class Social6ImageContentView extends SocialImageContentView {
     }
 
     @Override
-    protected int getImagesContentCount() {
+    public int getImagesContentCount() {
         return 6;
     }
 
@@ -46,6 +46,7 @@ public class Social6ImageContentView extends SocialImageContentView {
         ImageModule img2 = imageModules.get(1);
         ImageModule img3 = imageModules.get(2);
         ImageModule img4 = imageModules.get(3);
+
         ImageModule img5 = imageModules.get(4);
         ImageModule img6 = imageModules.get(5);
 

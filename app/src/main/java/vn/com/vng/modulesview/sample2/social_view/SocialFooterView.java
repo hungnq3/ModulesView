@@ -107,7 +107,7 @@ public class SocialFooterView extends ModulesView {
 
     private ImageModule buildLikeImgModule() {
         ImageModule module = new ImageModule();
-        module.setScaleType(ImageModule.ScaleType.FIT_CENTER);
+        module.setScaleType(ImageModule.FIT_CENTER);
         module.setPadding(mLeftMargin,dp(6),dp(6),dp(6));
         module.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_heart));
 
@@ -125,7 +125,7 @@ public class SocialFooterView extends ModulesView {
     private ImageModule buildCommentImgModule() {
         ImageModule module;
         module = new ImageModule();
-        module.setScaleType(ImageModule.ScaleType.FIT_CENTER);
+        module.setScaleType(ImageModule.FIT_CENTER);
         module.setPadding(dp(2));
         module.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_comment));
         return module;
@@ -142,7 +142,7 @@ public class SocialFooterView extends ModulesView {
 
     private ImageModule buildMoreImgModule() {
         ImageModule module = new ImageModule();
-        module.setScaleType(ImageModule.ScaleType.FIT_CENTER);
+        module.setScaleType(ImageModule.FIT_CENTER);
         module.setPadding(dp(8), dp(4), mLeftMargin, dp(4));
         module.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_more));
         return module;

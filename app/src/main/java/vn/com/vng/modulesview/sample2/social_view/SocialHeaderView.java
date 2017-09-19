@@ -1,6 +1,7 @@
 package vn.com.vng.modulesview.sample2.social_view;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -82,7 +83,7 @@ public class SocialHeaderView extends ModulesView {
 
     private ImageModule buildAvaModule() {
         ImageModule module = new ImageModule();
-        module.setScaleType(ImageModule.ScaleType.CENTER_CROP);
+        module.setScaleType(ImageModule.CENTER_CROP);
         module.setRoundCorner(ImageModule.ROUND_CIRCLE);
 
         return module;
@@ -98,7 +99,6 @@ public class SocialHeaderView extends ModulesView {
     }
 
     private TextModule buildTimeModule() {
-
         TextModule module = new TextModule();
         module.setTextSize(mTimeTextSize);
         module.setTextColor(mTimeTextColor);

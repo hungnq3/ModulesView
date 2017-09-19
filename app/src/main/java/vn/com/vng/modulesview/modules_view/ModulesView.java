@@ -244,10 +244,17 @@ public class ModulesView extends View {
         return handle || super.onTouchEvent(event);
     }
 
+
+    void invalidateChild(Module child){
+        if(child != null){
+            invalidate(child.getBoundLeft(), child.getBoundTop(), child.getBoundRight(), child.getBoundBottom());
+        }
+    }
+
     /**
      * @param module
      * @param event
-     * @return true if event occuren in module's bounds
+     * @return true if event occur in module's bounds
      */
 
     private boolean checkEventRegion(Module module, MotionEvent event) {
@@ -258,11 +265,11 @@ public class ModulesView extends View {
                 && y > module.getBoundTop() && y < module.getBoundBottom();
     }
 
-
-    @Override
-    public boolean isInTouchMode() {
-        return true;
-    }
+//
+//    @Override
+//    public boolean isInTouchMode() {
+//        return true;
+//    }
 
     public int sp(float sp) {
         return (int) (getContext().getResources().getDisplayMetrics().scaledDensity * sp);

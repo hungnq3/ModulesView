@@ -1,8 +1,16 @@
 package vn.com.vng.modulesview.sample2.adapter.holder;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.Toast;
 
+import java.util.Random;
+
+import vn.com.vng.modulesview.R;
+import vn.com.vng.modulesview.modules_view.ImageModule;
 import vn.com.vng.modulesview.modules_view.Module;
 import vn.com.vng.modulesview.sample2.adapter.view_item.BaseViewItem;
 import vn.com.vng.modulesview.sample2.adapter.view_item.SocialImageContextViewItem;
@@ -14,6 +22,7 @@ import vn.com.vng.modulesview.sample2.social_view.SocialImageContentView;
 
 public class SocialImageContentViewHolder extends BaseViewHolder {
     SocialImageContentView mSocialImageContentView;
+
     public SocialImageContentViewHolder(SocialImageContentView itemView) {
         super(itemView);
         mSocialImageContentView = itemView;
@@ -22,25 +31,24 @@ public class SocialImageContentViewHolder extends BaseViewHolder {
     }
 
     private void init() {
-        mSocialImageContentView.setOnImageClickListener(new Module.OnClickListener() {
-            @Override
-            public void onClick(Module module) {
-                Toast.makeText(module.getContext(), "Click img", Toast.LENGTH_SHORT).show();
-            }
-        });
-        mSocialImageContentView.setOnImageLongClickListener(new Module.OnLongClickListener() {
-            @Override
-            public void onLongClick(Module module) {
-                Toast.makeText(module.getContext(), "Long click img", Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
 
     @Override
-    public void onBind(BaseViewItem item) {
+    public void onBind(final BaseViewItem item) {
         super.onBind(item);
-        if(item instanceof SocialImageContextViewItem)
-            mSocialImageContentView.bindModel(((SocialImageContextViewItem) item).getSocialModel());
+        if (item instanceof SocialImageContextViewItem) {
+            for (int i = 0, count = mSocialImageContentView.getImagesContentCount(); i < count; ++i) {
+                mSocialImageContentView.bindImage(i, null);
+                final int finalI = i;
+                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mSocialImageContentView.bindImage(finalI, (((SocialImageContextViewItem) item).getSocialModel()).getImages().get(finalI));
+                        mSocialImageContentView.invalidate();
+                    }
+                }, 200*i);
+            }
+        }
     }
 }

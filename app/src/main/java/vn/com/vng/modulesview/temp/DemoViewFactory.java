@@ -33,21 +33,21 @@ public class DemoViewFactory {
 
         final ModulesView view = new ModulesView(context);
 
-        final ImageModule imgAva = buildImageModule(drawableimg, ImageModule.ScaleType.CENTER_CROP, ImageModule.ROUND_CIRCLE);
+        final ImageModule imgAva = buildImageModule(drawableimg, ImageModule.CENTER_CROP, ImageModule.ROUND_CIRCLE);
         final TextModule textName = buildTextModule("Cú vọ", sp(16), 0xff050505, Typeface.DEFAULT);
         final TextModule textTime = buildTextModule("20:27 Hôm qua", sp(12), 0xffaaaaaa, Typeface.DEFAULT);
 
         final TextModule textContent = buildTextModule("Cả cả cả mọi người trên thể giới ra đây mà xem, ra mà xem, ra mà xem, ra hết đây mà xem đê!!!", sp(14), 0xff222222, Typeface.DEFAULT);
-        final ImageModule img1 = buildImageModule(drawableimg, ImageModule.ScaleType.CENTER_CROP, ImageModule.ROUND_NONE);
-        final ImageModule img2 = buildImageModule(drawableimg, ImageModule.ScaleType.CENTER_CROP, ImageModule.ROUND_NONE);
-        final ImageModule img3 = buildImageModule(drawableimg, ImageModule.ScaleType.CENTER_CROP, ImageModule.ROUND_NONE);
+        final ImageModule img1 = buildImageModule(drawableimg, ImageModule.CENTER_CROP, ImageModule.ROUND_NONE);
+        final ImageModule img2 = buildImageModule(drawableimg, ImageModule.CENTER_CROP, ImageModule.ROUND_NONE);
+        final ImageModule img3 = buildImageModule(drawableimg, ImageModule.CENTER_CROP, ImageModule.ROUND_NONE);
 
 
-        final ImageModule imgLike = buildImageModule(drawableLike, ImageModule.ScaleType.FIT_CENTER, ImageModule.ROUND_NONE);
+        final ImageModule imgLike = buildImageModule(drawableLike, ImageModule.FIT_CENTER, ImageModule.ROUND_NONE);
         final TextModule textLike = buildTextModule("0", dp(14), 0xff222222, Typeface.DEFAULT);
         final TextModule textComment = buildTextModule("0", dp(14), 0xff222222, Typeface.DEFAULT);
-        final ImageModule imgComment = buildImageModule(drawableComment, ImageModule.ScaleType.FIT_CENTER, ImageModule.ROUND_NONE);
-        final ImageModule imgMore = buildImageModule(drawableMore, ImageModule.ScaleType.FIT_CENTER, ImageModule.ROUND_NONE);
+        final ImageModule imgComment = buildImageModule(drawableComment, ImageModule.FIT_CENTER, ImageModule.ROUND_NONE);
+        final ImageModule imgMore = buildImageModule(drawableMore, ImageModule.FIT_CENTER, ImageModule.ROUND_NONE);
 
 
         //add header
@@ -242,7 +242,7 @@ public class DemoViewFactory {
     }
 
 
-    private static ImageModule buildImageModule(Drawable drawable, ImageModule.ScaleType scaleType, int corner) {
+    private static ImageModule buildImageModule(Drawable drawable, @ImageModule.ScaleType  int scaleType, int corner) {
         ImageModule img = new ImageModule();
         img.setScaleType(scaleType);
         img.setImageDrawable(drawable);

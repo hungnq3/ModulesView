@@ -142,7 +142,7 @@ public class SocialModulesView extends ModulesView {
         //init
         imgAva = new ImageModule();
         imgAva.setRoundCorner(ImageModule.ROUND_CIRCLE);
-        imgAva.setScaleType(ImageModule.ScaleType.CENTER_CROP);
+        imgAva.setScaleType(ImageModule.CENTER_CROP);
 
         textName = new TextModule();
         textName.setTextSize(sp(16));
@@ -200,7 +200,7 @@ public class SocialModulesView extends ModulesView {
         list = new LinkedList<>();
         for (int i = 0; i < n; ++i) {
             ImageModule imgModule = new ImageModule();
-            imgModule.setScaleType(ImageModule.ScaleType.CENTER_CROP);
+            imgModule.setScaleType(ImageModule.CENTER_CROP);
 
             list.add(imgModule);
 
@@ -227,7 +227,7 @@ public class SocialModulesView extends ModulesView {
 
         //init
         imgLike = new ImageModule();
-        imgLike.setScaleType(ImageModule.ScaleType.FIT_CENTER);
+        imgLike.setScaleType(ImageModule.FIT_CENTER);
         imgLike.setPadding(dp(6));
         imgLike.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_heart));
 
@@ -242,12 +242,12 @@ public class SocialModulesView extends ModulesView {
         textComment.setPadding(dp(4));
 
         imgComment = new ImageModule();
-        imgComment.setScaleType(ImageModule.ScaleType.FIT_CENTER);
+        imgComment.setScaleType(ImageModule.FIT_CENTER);
         imgComment.setPadding(dp(2));
         imgComment.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_comment));
 
         imgMore = new ImageModule();
-        imgMore.setScaleType(ImageModule.ScaleType.FIT_CENTER);
+        imgMore.setScaleType(ImageModule.FIT_CENTER);
         imgMore.setPadding(dp(8), dp(4), dp(12), dp(4));
         imgMore.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_more));
 
