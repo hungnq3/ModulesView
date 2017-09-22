@@ -24,29 +24,19 @@ public class ImageModule extends Module {
     private static final Bitmap.Config BITMAP_CONFIG = Bitmap.Config.ARGB_8888;
     private static final int COLORDRAWABLE_DIMENSION = 1;
 
-    /**
-     * Options for scaling the bounds of an image to the bounds of this view.
-     */
+    public static final int ROUND_CIRCLE = -1;
+    public static final int ROUND_NONE = 0;
 
+    //Options for scaling the bounds of an image to the bounds of this module.
     public static final int FIT_CENTER = 0;
-    public static final int FIT_XY = 2;
-    public static final int CENTER = 3;
-    public static final int CENTER_CROP = 4;
-    public static final int CENTER_INSIDE = 5;
+    public static final int FIT_XY = 1;
+    public static final int CENTER = 2;
+    public static final int CENTER_CROP = 3;
+    public static final int CENTER_INSIDE = 4;
 
     @IntDef({FIT_CENTER, FIT_XY, CENTER, CENTER_CROP, CENTER_INSIDE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface ScaleType {
-    }
-
-    public static final int ROUND_CIRCLE = -1;
-    public static final int ROUND_NONE = 0;
-
-    public ImageModule() {
-        init();
-    }
-
-    private void init() {
     }
 
 
@@ -73,16 +63,14 @@ public class ImageModule extends Module {
     //-------------getter & setter----------------------
 
 
-    public
     @ScaleType
-    int getScaleType() {
+    public int getScaleType() {
         return mScaleType;
     }
 
     public void setScaleType(@ScaleType int scaleType) {
         if (mScaleType != scaleType) {
             mScaleType = scaleType;
-            configureImageBounds();
         }
     }
 
@@ -93,7 +81,6 @@ public class ImageModule extends Module {
     public void setRoundCorner(float roundCorner) {
         if (mRoundCorner != roundCorner) {
             mRoundCorner = roundCorner;
-            configureDrawRegionPath();
         }
     }
 
@@ -103,10 +90,10 @@ public class ImageModule extends Module {
 
     public void setBitmap(Bitmap bitmap) {
         mBitmap = bitmap;
-        if(mBitmap != null) {
+        if (mBitmap != null) {
             mBitmapShader = new BitmapShader(mBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
             mBitmapPaint.setShader(mBitmapShader);
-        }else{
+        } else {
             mBitmapShader = null;
             mBitmapPaint.setShader(null);
         }
@@ -140,7 +127,7 @@ public class ImageModule extends Module {
 
         if (FIT_XY == mScaleType) {
             /* If the drawable has no intrinsic size, or we're told to
-                scaletofit, then we just fill our entire view.
+                scale to fit, then we just fill our entire view.
             */
             mDrawMatrix = mMatrix;
             float scaleX = vWidth / (float) iWidth;
@@ -244,6 +231,7 @@ public class ImageModule extends Module {
         }
     }
 
+
     private void configureDrawRegionPath() {
         if (mBitmap != null) {
             mClipPath.reset();
@@ -257,7 +245,7 @@ public class ImageModule extends Module {
                 mClipPath.addRoundRect(mCLipRect, mRoundCorner, mRoundCorner, Path.Direction.CW);
             } else {
                 mCLipRect.set(0, 0, mDrawWidth, mDrawHeight);
-                mClipPath.addRect(mCLipRect, Path.Direction.CW);
+//                mClipPath.addRect(mCLipRect, Path.Direction.CW);
             }
         }
     }
@@ -297,7 +285,10 @@ public class ImageModule extends Module {
             canvas.translate(translateLeft, translateTop);
         }
 
-        canvas.drawPath(mClipPath, mBitmapPaint);
+        if (!mClipPath.isEmpty())
+            canvas.drawPath(mClipPath, mBitmapPaint);
+        else
+            canvas.drawRect(mCLipRect, mBitmapPaint);
 
         if (needToSave)
             canvas.restore();
@@ -335,5 +326,4 @@ public class ImageModule extends Module {
             return null;
         }
     }
-
 }

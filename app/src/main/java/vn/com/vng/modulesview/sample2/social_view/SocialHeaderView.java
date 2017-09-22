@@ -55,7 +55,6 @@ public class SocialHeaderView extends ModulesView {
     TextModule mTimeTextModule;
     private Module mTopLine;
 
-
     //properties
     Module.OnClickListener mOnAvaClickListener;
     Module.OnClickListener mOnNameClickListener;

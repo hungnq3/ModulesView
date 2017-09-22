@@ -27,10 +27,10 @@ public class SocialImageContentViewHolder extends BaseViewHolder {
         super(itemView);
         mSocialImageContentView = itemView;
         init();
-
     }
 
     private void init() {
+
     }
 
 

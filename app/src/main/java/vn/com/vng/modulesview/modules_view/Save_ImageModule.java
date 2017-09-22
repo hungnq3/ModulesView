@@ -98,7 +98,6 @@ public class Save_ImageModule extends Module {
             mDrawableWidth = -1;
             mDrawableHeight = -1;
         }
-
     }
 
     //-------------endregion------------------
@@ -117,7 +116,6 @@ public class Save_ImageModule extends Module {
         if (mDrawable == null) {
             return;
         }
-
         final int dwidth = mDrawableWidth;
         final int dheight = mDrawableHeight;
 

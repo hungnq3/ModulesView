@@ -107,7 +107,6 @@ public class SocialImageContentView extends ModulesView {
         ImageModule imageModule = mImageModules.get(position);
         imageModule.setBitmap(bitmap);
         imageModule.configModule();
-
 //        imageModule.invalidate();
     }
 

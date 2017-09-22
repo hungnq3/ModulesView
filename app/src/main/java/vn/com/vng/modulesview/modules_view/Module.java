@@ -246,7 +246,7 @@ public class Module {
 
             case MotionEvent.ACTION_UP: {
                 cancelLongClickWaiting();
-                handled = clickable() || handleTouchEvent(e);
+                handled = clickable();
                 if (clickable())
                     performClick();
                 break;
