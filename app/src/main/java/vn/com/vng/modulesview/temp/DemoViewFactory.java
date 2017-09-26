@@ -8,7 +8,6 @@ import android.view.View;
 import android.widget.Toast;
 
 import vn.com.vng.modulesview.Application;
-import vn.com.vng.modulesview.MainActivity;
 import vn.com.vng.modulesview.R;
 import vn.com.vng.modulesview.modules_view.ImageModule;
 import vn.com.vng.modulesview.modules_view.Module;
@@ -103,7 +102,7 @@ public class DemoViewFactory {
         imgAva.configModule();
 
         final int textNameMargin = dp(8);
-        textName.setBounds(avaMargin * 2 + avaSize, textNameMargin, Module.SPECIFIC_LATER, Module.SPECIFIC_LATER);
+        textName.setBounds(avaMargin * 2 + avaSize, textNameMargin, Module.BOUND_WRAP_CONTENT, Module.BOUND_WRAP_CONTENT);
 
         view.setOnMeasureListener(new ModulesView.OnMeasureListener() {
             @Override
@@ -119,7 +118,7 @@ public class DemoViewFactory {
 
                 //init content
                 textContent.configModule();
-                int contentHeight = textContent.getBoundBottom() - textContent.getBoundTop();
+                int contentHeight = textContent.getRealBottom() - textContent.getRealTop();
 
                 //init image region
                 int imgRegionTop = headerHeight + contentHeight;

@@ -1,15 +1,12 @@
 package vn.com.vng.modulesview.modules_view;
 
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
-import android.util.Log;
-import android.view.View;
 
 import com.facebook.fbui.textlayoutbuilder.TextLayoutBuilder;
 
@@ -161,25 +158,25 @@ public class TextModule extends Module {
     }
 
     private void buildTextLayout() {
-        int textWidth = Math.max(mBoundRight - mBoundLeft - mPaddingLeft - mPaddingRight, 0);
+        int textWidth = Math.max(mRealRight - mRealLeft - mPaddingLeft - mPaddingRight, 0);
         //build a layout to calculate text width and height
         mTextLayout = buildTextLayout(textWidth);
 
-        if (getBottom() == SPECIFIC_LATER) {
+        if (getBottom() == BOUND_WRAP_CONTENT) {
             int textHeight = mTextLayout.getHeight();
-            mBoundBottom = mBoundTop + textHeight + mPaddingTop + mPaddingBottom;
+            mRealBottom = mRealTop + textHeight + mPaddingTop + mPaddingBottom;
         }
 
-        if (getRight() == SPECIFIC_LATER) {
+        if (getRight() == BOUND_WRAP_CONTENT) {
             textWidth = mTextLayout.getWidth();
-            mBoundRight = mBoundLeft + textWidth + mPaddingLeft + mPaddingRight;
+            mRealRight = mRealLeft + textWidth + mPaddingLeft + mPaddingRight;
         }
     }
 
 
     private void configClipBounds() {
-        int width = mBoundRight - mBoundLeft;
-        int height = mBoundBottom - mBoundTop;
+        int width = mRealRight - mRealLeft;
+        int height = mRealBottom - mRealTop;
         mClipRect.set(0, 0, width, height);
     }
 
@@ -217,8 +214,8 @@ public class TextModule extends Module {
         canvas.save();
 
         //translate if needed
-        int translateLeft = mBoundLeft + mPaddingLeft;
-        int translateTop = mBoundTop + mPaddingTop;
+        int translateLeft = mRealLeft + mPaddingLeft;
+        int translateTop = mRealTop + mPaddingTop;
         if (translateLeft > 0 || translateTop > 0)
             canvas.translate(translateLeft, translateTop);
 

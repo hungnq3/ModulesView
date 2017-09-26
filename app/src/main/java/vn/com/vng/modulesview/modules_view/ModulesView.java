@@ -7,15 +7,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.LinkedList;
 import java.util.List;
-
-import vn.com.vng.modulesview.Application;
 
 /**
  * Created by HungNQ on 08/09/2017.
@@ -47,6 +44,7 @@ public class ModulesView extends View {
     public ModulesView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
+
 
 
 
@@ -171,11 +169,6 @@ public class ModulesView extends View {
         //notify listener & config modules
         if (mOnLayoutListener != null)
             mOnLayoutListener.onLayout(this, changed, width, height);
-//
-//        for (Module module : mModules) {
-//            if (!module.isIgnoreConfigFromParent())
-//                module.configModule(changed);
-//        }
     }
 
     public void setMeasureDimension(int width, int height) {
@@ -247,7 +240,7 @@ public class ModulesView extends View {
 
     void invalidateChild(Module child){
         if(child != null){
-            invalidate(child.getBoundLeft(), child.getBoundTop(), child.getBoundRight(), child.getBoundBottom());
+            invalidate(child.getRealLeft(), child.getRealTop(), child.getRealRight(), child.getRealBottom());
         }
     }
 
@@ -261,8 +254,8 @@ public class ModulesView extends View {
         int x = (int) (event.getX() - getX());
         int y = (int) (event.getY() - getX());
 
-        return x < module.getBoundRight() && x > module.getBoundLeft()
-                && y > module.getBoundTop() && y < module.getBoundBottom();
+        return x < module.getRealRight() && x > module.getRealLeft()
+                && y > module.getRealTop() && y < module.getRealBottom();
     }
 
 //

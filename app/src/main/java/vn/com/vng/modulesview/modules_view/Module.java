@@ -16,9 +16,9 @@ import android.view.MotionEvent;
 public class Module {
     private static final long LONG_CLICK_TIME = 500;
 
-    //if a bound (left, top, right, bottom) can not determine , let put SPECIFIC_LATER.
+    //if a bound (left, top, right, bottom) can not determine , let put BOUND_WRAP_CONTENT.
     //Depend on each module, bounds will be defined when the module call configModule()
-    public static final int SPECIFIC_LATER = -1;
+    public static final int BOUND_WRAP_CONTENT = -1;
 
 
     //stuff
@@ -29,24 +29,24 @@ public class Module {
 
     //properties:
     //Bounds of a module is expressed with 4 values mLeft, mTop, mRight and mBottom, which determine by call setBounds(left, top, right, bottom)
-    //For each bound, it can specify an exact number or SPECIFIC_LATER,
+    //For each bound, it can specify an exact number or BOUND_WRAP_CONTENT,
     // which means that the module will be specify when config.
-    //Example: A TextModule can call setBounds(0,0,SPECIFIC_LATER,SPECIFIC_LATER) which mean
+    //Example: A TextModule can call setBounds(0,0,BOUND_WRAP_CONTENT,BOUND_WRAP_CONTENT) which mean
     //right and bottom bounds will fit the text when the TextModule call configModule().
-    //And then the real bounds of element pass 4 values mBoundLeft, mBoundTop, mBoundRight, mBoundBottom
+    //And then the real bounds of element pass 4 values mRealLeft, mRealTop, mRealRight, mRealBottom
     private int mLeft, mTop, mRight, mBottom;
 
     //This is real bounds of module, where the module r eallylocated in the parent and how big it is.
     //Which be determined after configModule() called, depends on specific module that is definitely difference
     //For example:
     //with TextModule:
-    //mLeft = SPECIFIC_LATER -> mBoundLeft = 0;
-    //mTop = SPECIFIC_LATER -> mBoundTop = 0;
-    //mRight = SPECIFIC_LATER -> mBoundRight = the value that fit the text width and padding;
-    //mBottom = SPECIFIC_LATER -> mBoundRight = the value that fit the text height and padding;
+    //mLeft = BOUND_WRAP_CONTENT -> mRealLeft = 0;
+    //mTop = BOUND_WRAP_CONTENT -> mRealTop = 0;
+    //mRight = BOUND_WRAP_CONTENT -> mRealRight = the value that fit the text width and padding;
+    //mBottom = BOUND_WRAP_CONTENT -> mRealRight = the value that fit the text height and padding;
     // with ImageModule:
-    // SPECIFIC_LATER -> 0 for all bounds.
-    protected int mBoundLeft, mBoundTop, mBoundRight, mBoundBottom;
+    // BOUND_WRAP_CONTENT -> 0 for all bounds.
+    protected int mRealLeft, mRealTop, mRealRight, mRealBottom;
 
 
     protected int mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom;
@@ -90,20 +90,20 @@ public class Module {
         return mBottom;
     }
 
-    public int getBoundLeft() {
-        return mBoundLeft;
+    public int getRealLeft() {
+        return mRealLeft;
     }
 
-    public int getBoundTop() {
-        return mBoundTop;
+    public int getRealTop() {
+        return mRealTop;
     }
 
-    public int getBoundRight() {
-        return mBoundRight;
+    public int getRealRight() {
+        return mRealRight;
     }
 
-    public int getBoundBottom() {
-        return mBoundBottom;
+    public int getRealBottom() {
+        return mRealBottom;
     }
 
     public int getPaddingLeft() {
@@ -136,6 +136,14 @@ public class Module {
 
     public void setPaddingBottom(int paddingBottom) {
         mPaddingBottom = paddingBottom;
+    }
+
+    public int getWidth(){
+        return getRealRight() - getRealLeft();
+    }
+
+    public int getHeight(){
+        return getRealBottom() - getRealTop();
     }
 
     public void setPadding(int left, int top, int right, int bottom) {
@@ -202,10 +210,10 @@ public class Module {
 
 
     protected void onSetBounds(int left, int top, int right, int bottom) {
-        mBoundLeft = left > 0? left : 0;
-        mBoundTop = top > 0? top : 0;
-        mBoundRight = right > 0? right : 0;
-        mBoundBottom = bottom > 0 ? bottom : 0;
+        mRealLeft = left > 0? left : 0;
+        mRealTop = top > 0? top : 0;
+        mRealRight = right > 0? right : 0;
+        mRealBottom = bottom > 0 ? bottom : 0;
     }
 
 
@@ -217,8 +225,8 @@ public class Module {
 
     protected void drawBackground(Canvas canvas) {
         if (canvas != null && mBackgroundDrawable != null) {
-            if (mBoundLeft >= 0 && mBoundTop >= 0 && mBoundRight > 0 && mBoundBottom > 0) {
-                mBackgroundDrawable.setBounds(mBoundLeft, mBoundTop, mBoundRight, mBoundBottom);
+            if (mRealLeft >= 0 && mRealTop >= 0 && mRealRight > 0 && mRealBottom > 0) {
+                mBackgroundDrawable.setBounds(mRealLeft, mRealTop, mRealRight, mRealBottom);
                 mBackgroundDrawable.draw(canvas);
             }
         }
@@ -303,7 +311,6 @@ public class Module {
         if (mOnClickListener != null)
             mOnClickListener.onClick(this);
     }
-
 
 
     public void invalidate(){

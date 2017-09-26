@@ -1,6 +1,7 @@
 package vn.com.vng.modulesview.modules_view;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -13,8 +14,16 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.IntDef;
 
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
+import com.squareup.picasso.Target;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+
+import vn.com.vng.modulesview.R;
+import vn.com.vng.modulesview.image_loader.ImageLoader;
 
 /**
  * Created by HungNQ on 08/09/2017.
@@ -54,9 +63,8 @@ public class ImageModule extends Module {
 
     //properties
     private Bitmap mBitmap;
-    private
     @ScaleType
-    int mScaleType;
+    private int mScaleType;
     private float mRoundCorner;
 
 
@@ -120,8 +128,8 @@ public class ImageModule extends Module {
         final int iWidth = mBitmap.getWidth();
         final int iHeight = mBitmap.getHeight();
 
-        final int vWidth = mBoundRight - mBoundLeft - mPaddingLeft - mPaddingRight;
-        final int vHeight = mBoundBottom - mBoundTop - mPaddingTop - mPaddingBottom;
+        final int vWidth = mRealRight - mRealLeft - mPaddingLeft - mPaddingRight;
+        final int vHeight = mRealBottom - mRealTop - mPaddingTop - mPaddingBottom;
 
         final boolean fits = vWidth == iWidth && vHeight == iHeight;
 
@@ -276,8 +284,8 @@ public class ImageModule extends Module {
         }
 
 //        translate if needed
-        int translateLeft = mBoundLeft + mDrawTranslateX;
-        int translateTop = mBoundTop + mDrawTranslateY;
+        int translateLeft = mRealLeft + mDrawTranslateX;
+        int translateTop = mRealTop + mDrawTranslateY;
         boolean needToSave = translateLeft > 0 || translateTop > 0;
 
         if (needToSave) {
@@ -326,4 +334,75 @@ public class ImageModule extends Module {
             return null;
         }
     }
+
+
+    public void loadImage(final String url) {
+        loadImage(url, 0, 0);
+    }
+
+    public void loadImage(final String url, int placeHolderResId, int errorResId) {
+        if (getContext() == null)
+            return;
+
+        RequestCreator request = Picasso.with(getContext())
+                .load(url)
+                .priority(Picasso.Priority.HIGH);
+
+        if (errorResId != 0)
+            request.error(errorResId);
+
+        if (placeHolderResId != 0)
+            request.placeholder(placeHolderResId);
+
+        if ((getWidth() > 0 || getHeight() > 0)) {
+            request.resize(getWidth(), getHeight())
+                    .onlyScaleDown();
+
+            switch (mScaleType) {
+                case CENTER_INSIDE:
+                    request.centerInside();
+                    break;
+                case CENTER:
+                case CENTER_CROP:
+                    request.centerCrop();
+                    break;
+                case FIT_XY:
+                case FIT_CENTER:
+                    request.fit();
+                    break;
+            }
+        }
+        request.into(getLoaderTarget());
+    }
+
+    Target mLoaderTarget;
+
+    Target getLoaderTarget() {
+        if (mLoaderTarget == null)
+            mLoaderTarget = new Target() {
+                @Override
+                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                    setBitmap(bitmap);
+                    configModule();
+                    invalidate();
+                }
+
+                @Override
+                public void onBitmapFailed(Drawable errorDrawable) {
+                    setImageDrawable(errorDrawable);
+                    configModule();
+                    invalidate();
+                }
+
+                @Override
+                public void onPrepareLoad(Drawable placeHolderDrawable) {
+                    setImageDrawable(placeHolderDrawable);
+                    configModule();
+                    invalidate();
+                }
+            };
+        return mLoaderTarget;
+    }
+
+
 }

@@ -9,13 +9,13 @@ import java.util.List;
  */
 
 public class SocialModel {
-    private Bitmap mAvatar;
+    private String mAvatar;
     private String mName;
     private String mTime;
     private String mContent;
     private int mCommentCount;
     private int mLikeCount;
-    private List<Bitmap> mImages;
+    private List<String> mImages;
 
     public String getName() {
         return mName;
@@ -57,19 +57,19 @@ public class SocialModel {
         mLikeCount = likeCount;
     }
 
-    public List<Bitmap> getImages() {
+    public List<String> getImages() {
         return mImages;
     }
 
-    public void setImages(List<Bitmap> images) {
+    public void setImages(List<String> images) {
         mImages = images;
     }
 
-    public Bitmap getAvatar() {
+    public String getAvatar() {
         return mAvatar;
     }
 
-    public void setAvatar(Bitmap avatar) {
+    public void setAvatar(String avatar) {
         mAvatar = avatar;
     }
 }

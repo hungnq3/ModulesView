@@ -119,8 +119,8 @@ public class Save_ImageModule extends Module {
         final int dwidth = mDrawableWidth;
         final int dheight = mDrawableHeight;
 
-        final int vwidth = mBoundRight - mBoundLeft - mPaddingLeft - mPaddingRight;
-        final int vheight = mBoundBottom - mBoundTop - mPaddingTop - mPaddingBottom;
+        final int vwidth = mRealRight - mRealLeft - mPaddingLeft - mPaddingRight;
+        final int vheight = mRealBottom - mRealTop - mPaddingTop - mPaddingBottom;
 
         final boolean fits = (dwidth < 0 || vwidth == dwidth)
                 && (dheight < 0 || vheight == dheight);
@@ -192,8 +192,8 @@ public class Save_ImageModule extends Module {
     private void configureClipBounds() {
         if (mDrawable != null) {
             mClipPath.reset();
-            int width = mBoundRight - mBoundLeft - mPaddingRight - mPaddingLeft;
-            int height = mBoundBottom - mBoundTop - mPaddingBottom - mPaddingTop;
+            int width = mRealRight - mRealLeft - mPaddingRight - mPaddingLeft;
+            int height = mRealBottom - mRealTop - mPaddingBottom - mPaddingTop;
             mCLipRect.set(0, 0, width, height);
             if (mRoundCorner == ROUND_CIRCLE) {
                 float halfWidth = width / 2f;
@@ -224,8 +224,8 @@ public class Save_ImageModule extends Module {
         canvas.save();
 
 //        translate if needed
-        int translateLeft = mBoundLeft + mPaddingLeft;
-        int translateTop = mBoundTop + mPaddingTop;
+        int translateLeft = mRealLeft + mPaddingLeft;
+        int translateTop = mRealTop + mPaddingTop;
         if (translateLeft > 0 || translateTop > 0)
             canvas.translate(translateLeft, translateTop);
 
