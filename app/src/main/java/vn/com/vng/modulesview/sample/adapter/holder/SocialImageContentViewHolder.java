@@ -26,7 +26,6 @@ public class SocialImageContentViewHolder extends BaseViewHolder<SocialImageCont
         super.onBind(item);
         if (item != null) {
             for (int i = 0, count = mSocialImageContentView.getImagesContentCount(); i < count; ++i) {
-//                mSocialImageContentView.bindImage(i, null);
                 mSocialImageContentView.loadImage(i, item.getSocialModel().getImages().get(i));
             }
         }

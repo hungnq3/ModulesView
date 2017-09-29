@@ -31,17 +31,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         recyclerView = (RecyclerView) findViewById(R.id.recycler);
         setupRecycler();
-
-//        getWindow().setBackgroundDrawable(null);
-
-
     }
 
     private void setupRecycler() {
         mAdapter = new ModulesViewAdapter(buildItems());
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(mAdapter);
-
     }
 
     String[] IMGS = new String[]{
@@ -64,7 +59,8 @@ public class MainActivity extends AppCompatActivity {
 
     private List<String> getRandomImgs(){
         List<String> imgs = new LinkedList<>();
-        int size = new Random().nextInt(IMGS.length);
+//        int size = new Random().nextInt(IMGS.length);
+        int size = 6;
         for(int i=0; i<size; ++i)
             imgs.add(getRandomImg());
         return imgs;
@@ -91,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
         items.addAll(mockModel(getRandomImg(), "Cú chắc", "06:07 Hôm qua", "Cả cả cả mọi người trên thể giới ra đây mà xem, ra mà xem, ra mà xem, ra hết đây mà xem đê, ra mà xem, ra mà xem, ra hết đây mà xem đê!!!",21,0, getRandomImgs()));
         items.addAll(mockModel(getRandomImg(), "Cú chắc", "06:07 Hôm qua", "Cả cả cả mọi người trên thể giới ra đây mà xem, ra mà xem, ra mà xem, ra hết đây mà xem đê, ra mà xem, ra mà xem, ra hết đây mà xem đê!!!",22,2, getRandomImgs()));
 
-
         //double
         items.addAll(mockModel(getRandomImg(), "Cú vọ", "12:07 Hôm qua", "Cả cả cả mọi người trên thể giới ra đây mà xem", 5, 0, getRandomImgs()));
         items.addAll(mockModel(getRandomImg(), "Cú xám", "11:08 Hôm qua", "Cả cả cả mọi người trên thể giới ra đây mà xem, ra mà xem, ra mà xem, ra hết đây mà xem đê!!!", 12, 1, getRandomImgs()));
@@ -108,8 +103,6 @@ public class MainActivity extends AppCompatActivity {
         items.addAll(mockModel(getRandomImg(), "Cú cháu", "07:02 Hôm qua", "Cả cả cả mọi người trên thể giới ra đây mà xem, ra mà xem, ra mà xem, ra hết đây mà xem đê!!!", 15, 42, getRandomImgs()));
         items.addAll(mockModel(getRandomImg(), "Cú chắc", "06:07 Hôm qua", "Cả cả cả mọi người trên thể giới ra đây mà xem, ra mà xem, ra mà xem, ra hết đây mà xem đê, ra mà xem, ra mà xem, ra hết đây mà xem đê!!!", 12, 26, getRandomImgs()));
         items.addAll(mockModel(getRandomImg(), "Cú chắc", "06:07 Hôm qua", "Cả cả cả mọi người trên thể giới ra đây mà xem, ra mà xem, ra mà xem, ra hết đây mà xem đê, ra mà xem, ra mà xem, ra hết đây mà xem đê!!!", 12, 26, getRandomImgs()));
-
-
         items.addAll(mockModel(getRandomImg(), "Cú vọ", "12:07 Hôm qua", "Cả cả cả mọi người trên thể giới ra đây mà xem", 5, 0, getRandomImgs()));
 
         return items;
@@ -135,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
         items.add(new SocialFooterViewItem(model));
         return items;
     }
-
 
     //    private List<BaseViewItem> buildItems() {
 //        Bitmap img1 = BitmapFactory.decodeResource(getResources(), R.drawable.img);

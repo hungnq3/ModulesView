@@ -46,8 +46,6 @@ public class ModulesView extends View {
     }
 
 
-
-
     //stuff
     private List<Module> mModules = new LinkedList<>();
     private OnMeasureListener mOnMeasureListener;
@@ -147,12 +145,6 @@ public class ModulesView extends View {
         mOnLayoutListener = onLayoutListener;
     }
 
-    public void notifyModulesUpdate() {
-        for (Module module : mModules) {
-            module.configModule();
-        }
-    }
-
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
@@ -209,7 +201,6 @@ public class ModulesView extends View {
                         handle = mTouchFocusModule.onTouchEvent(event);
                     mTouchFocusModule = null;
                 }
-
                 break;
             }
 
@@ -238,11 +229,11 @@ public class ModulesView extends View {
     }
 
 
-    void invalidateChild(Module child){
-        if(child != null){
-            invalidate(child.getRealLeft(), child.getRealTop(), child.getRealRight(), child.getRealBottom());
-        }
-    }
+//    void invalidateChild(Module child){
+//        if(child != null){
+//            invalidate(child.getRealLeft(), child.getRealTop(), child.getRealRight(), child.getRealBottom());
+//        }
+//    }
 
     /**
      * @param module
@@ -272,5 +263,6 @@ public class ModulesView extends View {
     public int dp(float dp) {
         return (int) (getContext().getResources().getDisplayMetrics().density * dp);
     }
+
 
 }

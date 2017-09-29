@@ -81,8 +81,8 @@ public class SocialImageContentView extends ModulesView {
     }
 
 
-    public void bindImage(int position, Bitmap bitmap){
-        if(position <0 || position >= getImagesContentCount())
+    public void bindImage(int position, Bitmap bitmap) {
+        if (position < 0 || position >= getImagesContentCount())
             return;
         ImageModule imageModule = mImageModules.get(position);
         imageModule.setBitmap(bitmap);
@@ -90,12 +90,19 @@ public class SocialImageContentView extends ModulesView {
         imageModule.invalidate();
     }
 
-    public void loadImage(int position, String url){
-        if(position <0 || position >= getImagesContentCount())
+    public void loadImage(int position, final String url) {
+        if (position < 0 || position >= getImagesContentCount())
             return;
-        ImageModule imageModule = mImageModules.get(position);
-        imageModule.loadImage(url, R.drawable.img_place_holder, R.drawable.img_error);
-//        imageModule.loadImage(url);
+        final ImageModule imageModule = mImageModules.get(position);
+        if (imageModule.getWidth() > 0 || imageModule.getHeight() > 0)
+            imageModule.loadImage(url, R.drawable.img_place_holder, R.drawable.img_error);
+        else
+            post(new Runnable() {
+                @Override
+                public void run() {
+                    imageModule.loadImage(url, R.drawable.img_place_holder, R.drawable.img_error);
+                }
+            });
     }
 
     //-----------------listener------------

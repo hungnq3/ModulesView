@@ -22,9 +22,6 @@ import com.squareup.picasso.Target;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import vn.com.vng.modulesview.R;
-import vn.com.vng.modulesview.image_loader.ImageLoader;
-
 /**
  * Created by HungNQ on 08/09/2017.
  */
@@ -275,7 +272,6 @@ public class ImageModule extends Module {
     @Override
     protected void draw(Canvas canvas) {
         super.draw(canvas);
-
         if (mBitmap == null) {
             return;
         }
@@ -344,7 +340,7 @@ public class ImageModule extends Module {
         if (getContext() == null)
             return;
 
-        RequestCreator request = Picasso.with(getContext())
+        final RequestCreator request = Picasso.with(getContext())
                 .load(url)
                 .priority(Picasso.Priority.HIGH);
 
@@ -403,6 +399,4 @@ public class ImageModule extends Module {
             };
         return mLoaderTarget;
     }
-
-
 }

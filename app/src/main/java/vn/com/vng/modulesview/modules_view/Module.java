@@ -138,11 +138,11 @@ public class Module {
         mPaddingBottom = paddingBottom;
     }
 
-    public int getWidth(){
+    public int getWidth() {
         return getRealRight() - getRealLeft();
     }
 
-    public int getHeight(){
+    public int getHeight() {
         return getRealBottom() - getRealTop();
     }
 
@@ -210,12 +210,11 @@ public class Module {
 
 
     protected void onSetBounds(int left, int top, int right, int bottom) {
-        mRealLeft = left > 0? left : 0;
-        mRealTop = top > 0? top : 0;
-        mRealRight = right > 0? right : 0;
+        mRealLeft = left > 0 ? left : 0;
+        mRealTop = top > 0 ? top : 0;
+        mRealRight = right > 0 ? right : 0;
         mRealBottom = bottom > 0 ? bottom : 0;
     }
-
 
 
     //this method was called in ModuleView parent to let module draw on the canvas of parent view.
@@ -268,11 +267,12 @@ public class Module {
     }
 
 
-    protected boolean handleTouchEvent(MotionEvent event){
-        if(mOnTouchListener != null)
+    protected boolean handleTouchEvent(MotionEvent event) {
+        if (mOnTouchListener != null)
             return mOnTouchListener.onTouch(this, event);
-       return false;
+        return false;
     }
+
     private Handler mLongClickTriggerHandler;
     private Runnable mLongClickTriggerRunnable = new Runnable() {
         @Override
@@ -283,7 +283,6 @@ public class Module {
                 mParent.onTouchEvent(MotionEvent.obtain(0, 0, MotionEvent.ACTION_CANCEL, getLeft(), getTop(), 0));
         }
     };
-
 
 
     private void startWaitingLongClick() {
@@ -313,10 +312,12 @@ public class Module {
     }
 
 
-    public void invalidate(){
-        if(mParent != null)
-            mParent.invalidateChild(this);
+    public void invalidate() {
+        if (mParent != null)
+//            mParent.invalidateChild(this);
+            mParent.invalidate();
     }
+
     //-------------interface region--------------------
     public interface OnClickListener {
         void onClick(Module module);
@@ -326,7 +327,7 @@ public class Module {
         void onLongClick(Module module);
     }
 
-    public interface OnTouchListener{
+    public interface OnTouchListener {
         boolean onTouch(Module module, MotionEvent event);
     }
 
